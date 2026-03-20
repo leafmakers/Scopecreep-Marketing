@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope Creep — The execution engine for creative work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS
+   ═══════════════════════════════════════ */
+:root {
+  --bg: #09090B;
+  --bg-1: #0F0F12;
+  --bg-2: #151518;
+  --bg-3: #1B1B1F;
+  --border: #222228;
+  --border-h: #333339;
+  --t1: #EDEDEF;
+  --t2: #A1A1AA;
+  --t3: #63636E;
+  --t4: #3B3B44;
+  --accent: #E05A33;
+  --accent-s: #F06B44;
+  --accent-g: rgba(224,90,51,0.10);
+  --accent-g2: rgba(224,90,51,0.20);
+  --green: #34D399;
+  --blue: #60A5FA;
+  --yellow: #FACC15;
+  --red: #F87171;
+  --purple: #A78BFA;
+  --teal: #2DD4BF;
+  --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'Geist Mono', 'SF Mono', monospace;
+  --r: 12px;
+  --r-s: 8px;
+  --r-xs: 6px;
+  --max: 1140px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); background: var(--bg); color: var(--t1);
+  -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.6; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent); color: #fff; }
+img { display: block; max-width: 100%; }
+
+/* ═══════════════════════════════════════
+   NAV — Raycast-style: frosted, minimal
+   ═══════════════════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px;
+  display: flex; align-items: center; justify-content: center; padding: 0 24px;
+  background: rgba(9,9,11,0.72); backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid transparent; transition: border-color 0.3s;
+}
+.nav.scrolled { border-bottom-color: var(--border); }
+.nav-inner { width: 100%; max-width: var(--max); display: flex; align-items: center; justify-content: space-between; }
+.nav-left { display: flex; align-items: center; gap: 28px; }
+.logo { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+.logo-mark {
+  width: 22px; height: 22px; border-radius: 6px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-mark svg { width: 12px; height: 12px; }
+.nav-links { display: flex; gap: 22px; }
+.nav-links a { font-size: 13px; font-weight: 500; color: var(--t3); transition: color 0.15s; }
+.nav-links a:hover { color: var(--t1); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.btn {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px;
+  border-radius: var(--r-xs); border: 1px solid var(--border); background: transparent;
+  color: var(--t2); cursor: pointer; transition: all 0.15s;
+}
+.btn:hover { border-color: var(--border-h); color: var(--t1); }
+.btn-a {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px;
+  border-radius: var(--r-xs); border: 1px solid var(--accent); background: var(--accent);
+  color: #fff; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center;
+}
+.btn-a:hover { background: var(--accent-s); border-color: var(--accent-s); box-shadow: 0 0 28px var(--accent-g); }
+
+/* ═══════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════ */
+.hero { padding: 152px 24px 64px; text-align: center; position: relative; }
+.hero::after {
+  content:''; position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 700px; background: radial-gradient(circle, rgba(224,90,51,0.07) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-pill {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500;
+  color: var(--accent); background: var(--accent-g); border: 1px solid rgba(224,90,51,0.15);
+  border-radius: 100px; padding: 5px 14px 5px 10px; margin-bottom: 28px;
+  animation: fadeUp 0.5s ease both;
+}
+.hero-pill-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 2.5s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-size: clamp(40px, 6.2vw, 74px); font-weight: 700; letter-spacing: -2px;
+  line-height: 1.04; max-width: 800px; margin: 0 auto 24px; animation: fadeUp 0.5s ease 0.05s both;
+}
+.gr {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--yellow) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  font-size: 17px; font-weight: 400; color: var(--t2); max-width: 540px;
+  margin: 0 auto 36px; line-height: 1.65; animation: fadeUp 0.5s ease 0.1s both;
+}
+.hero-cta { display: flex; align-items: center; justify-content: center; gap: 12px; animation: fadeUp 0.5s ease 0.15s both; }
+.hero-cta .btn-a { padding: 10px 24px; font-size: 14px; }
+.hero-cta .btn { padding: 10px 20px; font-size: 14px; }
+.hero-meta { font-size: 12px; color: var(--t4); margin-top: 12px; animation: fadeUp 0.5s ease 0.2s both; }
+@keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════
+   EMOTIONAL REFRAME — Raycast: "It's not about saving time..."
+   ═══════════════════════════════════════ */
+.reframe {
+  padding: 100px 24px 0; text-align: center;
+}
+.reframe h2 {
+  font-size: clamp(22px, 3vw, 32px); font-weight: 600; color: var(--t2); letter-spacing: -0.5px;
+  line-height: 1.35; max-width: 580px; margin: 0 auto;
+}
+.reframe h2 strong { color: var(--t1); font-weight: 700; }
+
+/* ═══════════════════════════════════════
+   4 PILLARS — Raycast: keyboard grid with value labels
+   ═══════════════════════════════════════ */
+.pillars { padding: 72px 24px 0; }
+.pillars-grid {
+  max-width: var(--max); margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+}
+.pillar {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px 24px; text-align: center; transition: border-color 0.2s, transform 0.2s;
+}
+.pillar:hover { border-color: var(--border-h); transform: translateY(-2px); }
+.pillar-icon {
+  width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.pillar h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.2px; }
+.pillar p { font-size: 13px; color: var(--t2); line-height: 1.55; }
+
+.pi-orange { background: var(--accent-g); color: var(--accent); }
+.pi-green { background: rgba(52,211,153,0.1); color: var(--green); }
+.pi-blue { background: rgba(96,165,250,0.1); color: var(--blue); }
+.pi-yellow { background: rgba(250,204,21,0.1); color: var(--yellow); }
+
+/* ═══════════════════════════════════════
+   DIVIDER / SECTION UTILITIES
+   ═══════════════════════════════════════ */
+.div { max-width: var(--max); margin: 0 auto; height: 1px; background: var(--border); }
+.sec { max-width: var(--max); margin: 0 auto; padding: 120px 24px; }
+.sec-tag { font-size: 12px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+.sec-h { font-size: clamp(28px, 3.5vw, 40px); font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 14px; }
+.sec-p { font-size: 16px; color: var(--t2); max-width: 520px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   SLIDE-TO-WORK — The killer ecosystem feature
+   ═══════════════════════════════════════ */
+.stw-visual {
+  margin-top: 56px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 100px var(--accent-g);
+}
+.stw-bar {
+  display: flex; align-items: center; height: 40px; padding: 0 16px;
+  background: var(--bg-2); border-bottom: 1px solid var(--border); gap: 8px;
+}
+.stw-dot { width: 9px; height: 9px; border-radius: 50%; }
+.stw-dot.r { background: #FF5F57; } .stw-dot.y { background: #FEBC2E; } .stw-dot.g { background: #28C840; }
+.stw-bar-title {
+  margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--t3);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 3px 10px;
+}
+.stw-body { display: grid; grid-template-columns: 340px 1fr; min-height: 440px; }
+
+/* Album side */
+.stw-album { border-right: 1px solid var(--border); padding: 24px; background: var(--bg); }
+.stw-album-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--blue); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+}
+.stw-album-label::before { content:''; width: 5px; height: 5px; background: var(--blue); border-radius: 50%; }
+.stw-slide {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
+  padding: 14px; margin-bottom: 10px; cursor: default; transition: border-color 0.15s;
+}
+.stw-slide:hover { border-color: var(--border-h); }
+.stw-slide.active { border-color: var(--accent); background: rgba(224,90,51,0.04); }
+.stw-slide-num { font-family: var(--mono); font-size: 10px; color: var(--t4); margin-bottom: 6px; }
+.stw-slide-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.stw-slide-meta { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 8px; }
+.stw-slide-meta .dot { width: 4px; height: 4px; border-radius: 50%; }
+.stw-slide-meta .dot.g { background: var(--green); }
+.stw-slide-meta .dot.y { background: var(--yellow); }
+.stw-slide-meta .dot.r { background: var(--red); }
+
+/* Arrow connector */
+.stw-arrow {
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.stw-arrow::before {
+  content: '→'; font-size: 20px; color: var(--accent); position: absolute;
+  left: -12px; top: 50%; transform: translateY(-50%);
+}
+
+/* Scope side */
+.stw-scope { padding: 24px; }
+.stw-scope-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+}
+.stw-scope-label::before { content:''; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+.stw-scope-header {
+  font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px;
+}
+.stw-scope-sub { font-size: 12px; color: var(--t3); margin-bottom: 20px; }
+.stw-task {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.35s ease both;
+}
+.stw-task:last-child { border-bottom: none; }
+.stw-task:nth-child(3) { animation-delay: 0.1s; }
+.stw-task:nth-child(4) { animation-delay: 0.2s; }
+.stw-task:nth-child(5) { animation-delay: 0.3s; }
+.stw-task:nth-child(6) { animation-delay: 0.4s; }
+.stw-task:nth-child(7) { animation-delay: 0.5s; }
+.stw-check {
+  width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border-h);
+  flex-shrink: 0; margin-top: 2px; transition: all 0.15s;
+}
+.stw-check.done { background: var(--green); border-color: var(--green); }
+.stw-task-body { flex: 1; }
+.stw-task-title { font-size: 13px; font-weight: 500; }
+.stw-task-title.done { color: var(--t3); text-decoration: line-through; }
+.stw-task-tags { display: flex; gap: 6px; margin-top: 4px; }
+.stw-tag {
+  font-family: var(--mono); font-size: 9px; font-weight: 500; padding: 2px 7px;
+  border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.tag-ws { background: rgba(96,165,250,0.1); color: var(--blue); }
+.tag-ai { background: rgba(167,139,250,0.1); color: var(--purple); }
+.tag-pr { background: rgba(250,204,21,0.1); color: var(--yellow); }
+.tag-bl { background: rgba(248,113,113,0.1); color: var(--red); }
+.tag-rv { background: rgba(45,212,191,0.1); color: var(--teal); }
+
+/* ═══════════════════════════════════════
+   AI DELEGATION — Raycast AI section energy
+   ═══════════════════════════════════════ */
+.ai-section { position: relative; }
+.ai-section::before {
+  content:''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
+.ai-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px; transition: border-color 0.2s;
+}
+.ai-card:hover { border-color: var(--border-h); }
+.ai-card .ai-icon {
+  width: 32px; height: 32px; border-radius: var(--r-s); margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  background: rgba(167,139,250,0.1); color: var(--purple);
+}
+.ai-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.ai-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   USE CASES — Raycast extensions showcase energy
+   ═══════════════════════════════════════ */
+.uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
+.uc-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px; transition: border-color 0.2s, transform 0.2s;
+}
+.uc-card:hover { border-color: var(--border-h); transform: translateY(-2px); }
+.uc-card .uc-icon {
+  font-size: 24px; margin-bottom: 16px;
+}
+.uc-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.uc-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
+.uc-card .uc-flow {
+  margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px;
+}
+.uc-flow-tag {
+  font-family: var(--mono); font-size: 10px; color: var(--t3);
+  background: var(--bg); border: 1px solid var(--border); padding: 3px 9px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════
+   ECOSYSTEM — Album OS + Scope Creep + Bad Actors
+   ═══════════════════════════════════════ */
+.eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
+.eco-card {
+  border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
+  position: relative; overflow: hidden; background: var(--bg-2);
+}
+.eco-card::before {
+  content:''; position: absolute; top: 0; left: 0; right: 0; height: 100px; pointer-events: none;
+}
+.eco-card.c-blue::before { background: linear-gradient(180deg, rgba(96,165,250,0.06) 0%, transparent 100%); }
+.eco-card.c-orange::before { background: linear-gradient(180deg, rgba(224,90,51,0.06) 0%, transparent 100%); }
+.eco-card.c-purple::before { background: linear-gradient(180deg, rgba(167,139,250,0.06) 0%, transparent 100%); }
+.eco-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px;
+}
+.eco-card.c-blue .eco-label { color: var(--blue); }
+.eco-card.c-orange .eco-label { color: var(--accent); }
+.eco-card.c-purple .eco-label { color: var(--purple); }
+.eco-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; line-height: 1.3; }
+.eco-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   FEATURE SPREAD — Raycast "What else can it do?" energy
+   ═══════════════════════════════════════ */
+.spread {
+  padding: 80px 24px 120px; text-align: center; max-width: var(--max); margin: 0 auto;
+}
+.spread-title { font-size: 20px; font-weight: 600; color: var(--t2); margin-bottom: 24px; }
+.spread-title strong { color: var(--t1); }
+.spread-cloud {
+  font-size: 15px; color: var(--t3); line-height: 2.2; max-width: 800px; margin: 0 auto;
+}
+.spread-cloud span {
+  display: inline-block; padding: 4px 14px; margin: 3px;
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 100px;
+  font-size: 13px; font-weight: 500; transition: border-color 0.15s, color 0.15s;
+  cursor: default;
+}
+.spread-cloud span:hover { border-color: var(--border-h); color: var(--t1); }
+
+/* ═══════════════════════════════════════
+   CTA
+   ═══════════════════════════════════════ */
+.cta { padding: 120px 24px 160px; text-align: center; position: relative; }
+.cta::before {
+  content:''; position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 500px;
+  background: radial-gradient(ellipse at center bottom, rgba(224,90,51,0.06) 0%, transparent 55%);
+  pointer-events: none;
+}
+.cta > * { position: relative; z-index: 1; }
+.cta h2 {
+  font-size: clamp(32px, 4.5vw, 52px); font-weight: 700; letter-spacing: -1.2px;
+  line-height: 1.1; max-width: 640px; margin: 0 auto 16px;
+}
+.cta p { font-size: 16px; color: var(--t3); margin-bottom: 36px; }
+.cta-actions { display: flex; justify-content: center; gap: 12px; }
+.cta-actions .btn-a { padding: 12px 28px; font-size: 14px; }
+.cta-actions .btn { padding: 12px 24px; font-size: 14px; }
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+.footer {
+  max-width: var(--max); margin: 0 auto; padding: 24px;
+  border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+}
+.footer-l { font-size: 12px; color: var(--t4); }
+.footer-r { display: flex; gap: 20px; }
+.footer-r a { font-size: 12px; font-weight: 500; color: var(--t4); transition: color 0.15s; }
+.footer-r a:hover { color: var(--t2); }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media (max-width: 900px) {
+  .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+  .stw-body { grid-template-columns: 1fr; }
+  .stw-album { border-right: none; border-bottom: 1px solid var(--border); }
+  .ai-grid, .uc-grid { grid-template-columns: 1fr; }
+  .eco-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero-cta { flex-wrap: wrap; }
+  .cta-actions { flex-wrap: wrap; justify-content: center; }
+}
+@media (max-width: 520px) {
+  .pillars-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="#" class="logo">
+        <span class="logo-mark"><svg viewBox="0 0 12 12" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" stroke="#fff" stroke-width="1.4"/><path d="M5 5.5L6.5 7L9 4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Scope Creep
+      </a>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#ai">AI Delegation</a>
+        <a href="#cases">Use cases</a>
+        <a href="#ecosystem">Ecosystem</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="btn">Log in</button>
+      <a href="#cta" class="btn-a">Get early access</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-pill"><span class="hero-pill-dot"></span> The execution engine for creative work</div>
+  <h1>Your shortcut to <span class="gr">shipping.</span></h1>
+  <p class="hero-sub">Turn projects, slides, and deliverables into structured tasks, AI-assisted workflows, and real momentum. Built for creative builders who think in systems.</p>
+  <div class="hero-cta">
+    <a href="#cta" class="btn-a">Request early access</a>
+    <a href="#how" class="btn">See how it works</a>
+  </div>
+  <p class="hero-meta">Part of the Album OS ecosystem · For builders, designers, and small teams</p>
+</section>
+
+<!-- ═══ EMOTIONAL REFRAME ═══ -->
+<section class="reframe">
+  <h2>It's not about managing tasks.<br><strong>It's about never losing momentum.</strong></h2>
+</section>
+
+<!-- ═══ 4 PILLARS ═══ -->
+<section class="pillars">
+  <div class="pillars-grid">
+    <div class="pillar">
+      <div class="pillar-icon pi-orange">◎</div>
+      <h3>Context-first.</h3>
+      <p>Every task knows why it exists, what project it belongs to, and what output is expected.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon pi-green">◆</div>
+      <h3>Deliverable-driven.</h3>
+      <p>Work stays attached to real outputs — decks, prototypes, pages, specs. Not floating checkboxes.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon pi-blue">⬡</div>
+      <h3>AI-delegated.</h3>
+      <p>Delegate to agents with full project context. Not generic prompts — structured execution.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon pi-yellow">△</div>
+      <h3>Scope-aware.</h3>
+      <p>See when work is expanding. Scope drift detection makes the invisible visible.</p>
+    </div>
+  </div>
+</section>
+
+<div class="div" style="margin-top: 100px;"></div>
+
+<!-- ═══ SLIDE-TO-WORK ═══ -->
+<section class="sec" id="how">
+  <div class="sec-tag">How it works</div>
+  <div class="sec-h">Every slide becomes a work dashboard.</div>
+  <div class="sec-p">Album OS structures your project as slides and artifacts. Scope Creep turns each one into executable tasks, assignments, and agent jobs — bidirectionally synced.</div>
+
+  <div class="stw-visual">
+    <div class="stw-bar">
+      <div class="stw-dot r"></div><div class="stw-dot y"></div><div class="stw-dot g"></div>
+      <div class="stw-bar-title">LeafMaker Launch</div>
+    </div>
+    <div class="stw-body">
+      <!-- Album side -->
+      <div class="stw-album">
+        <div class="stw-album-label">Album OS · Slides</div>
+        <div class="stw-slide">
+          <div class="stw-slide-num">01</div>
+          <div class="stw-slide-title">Positioning</div>
+          <div class="stw-slide-meta"><span class="dot g"></span> 4/4 tasks done</div>
+        </div>
+        <div class="stw-slide">
+          <div class="stw-slide-num">02</div>
+          <div class="stw-slide-title">Audience</div>
+          <div class="stw-slide-meta"><span class="dot g"></span> 3/3 tasks done</div>
+        </div>
+        <div class="stw-slide active">
+          <div class="stw-slide-num">03</div>
+          <div class="stw-slide-title">Landing Page</div>
+          <div class="stw-slide-meta"><span class="dot y"></span> 3/7 tasks done</div>
+        </div>
+        <div class="stw-slide">
+          <div class="stw-slide-num">04</div>
+          <div class="stw-slide-title">Pricing</div>
+          <div class="stw-slide-meta"><span class="dot r"></span> 0/5 tasks — blocked</div>
+        </div>
+        <div class="stw-slide">
+          <div class="stw-slide-num">05</div>
+          <div class="stw-slide-title">Visual System</div>
+          <div class="stw-slide-meta"><span class="dot y"></span> 2/6 tasks done</div>
+        </div>
+        <div class="stw-slide">
+          <div class="stw-slide-num">06</div>
+          <div class="stw-slide-title">Launch Sequence</div>
+          <div class="stw-slide-meta"><span class="dot r"></span> Not started</div>
+        </div>
+      </div>
+      <!-- Scope side -->
+      <div class="stw-scope">
+        <div class="stw-scope-label">Scope Creep · Tasks</div>
+        <div class="stw-scope-header">Landing Page</div>
+        <div class="stw-scope-sub">Slide 03 · 3 of 7 complete · 2 delegated to AI</div>
+
+        <div class="stw-task">
+          <div class="stw-check done"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title done">Write hero copy</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Copy</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check done"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title done">Create 3 mood directions</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Design</span><span class="stw-tag tag-ai">AI drafted</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check done"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title done">Compare competitor references</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Research</span><span class="stw-tag tag-ai">AI drafted</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title">Generate illustration prompt</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Design</span><span class="stw-tag tag-pr">In progress</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title">Review with founder</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-rv">Review</span><span class="stw-tag tag-bl">Blocked</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title">Prepare dev handoff</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Dev</span></div>
+          </div>
+        </div>
+        <div class="stw-task">
+          <div class="stw-check"></div>
+          <div class="stw-task-body">
+            <div class="stw-task-title">Mobile responsive version</div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">Dev</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- ═══ AI DELEGATION ═══ -->
+<section class="sec ai-section" id="ai">
+  <div class="sec-tag">AI Delegation</div>
+  <div class="sec-h">Not generic prompts.<br>Structured execution.</div>
+  <div class="sec-p">Scope Creep sends your AI agent full project context — sources, constraints, prior decisions, and expected output format. Every delegation is a real job, not a chat message.</div>
+  <div class="ai-grid">
+    <div class="ai-card">
+      <div class="ai-icon">⚡</div>
+      <h3>Context Packs</h3>
+      <p>Bundle brand rules, references, prior decisions, repo links, and constraints into reusable packs. Attach them to any task or agent job.</p>
+    </div>
+    <div class="ai-card">
+      <div class="ai-icon">◎</div>
+      <h3>Agent Jobs</h3>
+      <p>Structured AI-executable tasks with role, prompt, source context, expected output, and approval mode. Not a freeform chat — a real assignment.</p>
+    </div>
+    <div class="ai-card">
+      <div class="ai-icon">↻</div>
+      <h3>Review Workflow</h3>
+      <p>AI drafts go through draft → pending review → approved → shipped. You stay in control. The agent does the heavy lifting.</p>
+    </div>
+    <div class="ai-card">
+      <div class="ai-icon">△</div>
+      <h3>Scope Intelligence</h3>
+      <p>Detects task explosion, duplicate work, unclear ownership, missing deliverable links, and excessive revisions. Surfaces cut/defer/re-scope recommendations.</p>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- ═══ USE CASES ═══ -->
+<section class="sec" id="cases">
+  <div class="sec-tag">Use cases</div>
+  <div class="sec-h">Built for how creative work actually moves.</div>
+  <div class="sec-p">Not project management theory. Real workflows for people who ship.</div>
+  <div class="uc-grid">
+    <div class="uc-card">
+      <div class="uc-icon">🚀</div>
+      <h3>Product launch</h3>
+      <p>Album holds your launch deck. Scope Creep generates tasks for copy, visuals, landing page, pricing, launch email, demo video, and FAQ — all tied to slides.</p>
+      <div class="uc-flow">
+        <span class="uc-flow-tag">copy</span><span class="uc-flow-tag">visuals</span><span class="uc-flow-tag">landing</span><span class="uc-flow-tag">pricing</span><span class="uc-flow-tag">email</span><span class="uc-flow-tag">video</span>
+      </div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🎨</div>
+      <h3>Design system</h3>
+      <p>Album structures components and principles. Scope Creep turns them into audit tasks, token definitions, variant creation, docs, and engineering handoff.</p>
+      <div class="uc-flow">
+        <span class="uc-flow-tag">audit</span><span class="uc-flow-tag">tokens</span><span class="uc-flow-tag">variants</span><span class="uc-flow-tag">docs</span><span class="uc-flow-tag">handoff</span>
+      </div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">📹</div>
+      <h3>Content pipeline</h3>
+      <p>Album stores content cards. Scope Creep manages scripting, shot lists, AI visual generation, editing, review, and publishing sequence.</p>
+      <div class="uc-flow">
+        <span class="uc-flow-tag">script</span><span class="uc-flow-tag">shots</span><span class="uc-flow-tag">AI gen</span><span class="uc-flow-tag">edit</span><span class="uc-flow-tag">publish</span>
+      </div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">📋</div>
+      <h3>Product spec</h3>
+      <p>Album holds the spec narrative. Scope Creep handles requirements drafting, dependency mapping, developer clarifications, QA checklist, and release prep.</p>
+      <div class="uc-flow">
+        <span class="uc-flow-tag">requirements</span><span class="uc-flow-tag">deps</span><span class="uc-flow-tag">QA</span><span class="uc-flow-tag">release</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- ═══ ECOSYSTEM ═══ -->
+<section class="sec" id="ecosystem">
+  <div class="sec-tag">Ecosystem</div>
+  <div class="sec-h">Three layers. One project world.</div>
+  <div class="sec-p">Album OS organizes. Scope Creep executes. Bad Actors personify. Same project, different lenses.</div>
+  <div class="eco-grid">
+    <div class="eco-card c-blue">
+      <div class="eco-label">Album OS</div>
+      <h3>The artifact layer.</h3>
+      <p>Projects, slides, cards, ideas, assets, context, documents, deliverables. The structured operating environment where work is organized and presented.</p>
+    </div>
+    <div class="eco-card c-orange">
+      <div class="eco-label">Scope Creep</div>
+      <h3>The execution layer.</h3>
+      <p>Tasks, delegation, work states, AI orchestration, focus, deadlines, progress, scope detection. Where momentum becomes visible and work moves forward.</p>
+    </div>
+    <div class="eco-card c-purple">
+      <div class="eco-label">Bad Actors</div>
+      <h3>The agent layer.</h3>
+      <p>Characters, personas, AI guides. The identity and personality system that shapes how agents work, communicate, and assist across the ecosystem.</p>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- ═══ FEATURE SPREAD ═══ -->
+<section class="spread">
+  <div class="spread-title">What else can Scope Creep do?<br><strong>More than you'd expect.</strong></div>
+  <div class="spread-cloud">
+    <span>Projects</span>
+    <span>Workstreams</span>
+    <span>Task dependencies</span>
+    <span>Context packs</span>
+    <span>Agent jobs</span>
+    <span>Focus sessions</span>
+    <span>Deliverable tracking</span>
+    <span>Scope warnings</span>
+    <span>Review workflows</span>
+    <span>Daily execution view</span>
+    <span>Slide-to-task generation</span>
+    <span>AI task breakdown</span>
+    <span>Priority queues</span>
+    <span>Blocked item surfacing</span>
+    <span>Version notes</span>
+    <span>Rich attachments</span>
+    <span>Decision logs</span>
+    <span>Energy-based suggestions</span>
+    <span>Templates</span>
+    <span>Bidirectional Album sync</span>
+    <span>Team views</span>
+    <span>Personal + project modes</span>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta" id="cta">
+  <h2>From "there's a lot to do" to <span class="gr">"this is the next right move."</span></h2>
+  <p>Scope Creep is in private beta. Built for builders who ship.</p>
+  <div class="cta-actions">
+    <a href="mailto:hello@scopecreep.app" class="btn-a">Request early access</a>
+    <a href="#how" class="btn">Back to top</a>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-l">© 2026 Scope Creep · Part of the Album OS ecosystem</div>
+  <div class="footer-r"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">Discord</a></div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; } });
+}, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.pillar, .ai-card, .uc-card, .eco-card, .spread-cloud span').forEach((el, i) => {
+  el.style.opacity = '0'; el.style.transform = 'translateY(14px)';
+  el.style.transition = `opacity 0.4s ease ${i * 0.04}s, transform 0.4s ease ${i * 0.04}s`;
+  io.observe(el);
+});
+</script>
+
+</body>
+</html>
