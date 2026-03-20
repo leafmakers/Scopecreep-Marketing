@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,29 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
-   TOKENS
+   SHARED TOKENS
    ═══════════════════════════════════════ */
 :root {
-  --bg: #09090B;
-  --bg-1: #0F0F12;
-  --bg-2: #151518;
-  --bg-3: #1B1B1F;
-  --border: #222228;
-  --border-h: #333339;
-  --t1: #EDEDEF;
-  --t2: #A1A1AA;
-  --t3: #63636E;
-  --t4: #3B3B44;
-  --accent: #E05A33;
-  --accent-s: #F06B44;
-  --accent-g: rgba(224,90,51,0.10);
-  --accent-g2: rgba(224,90,51,0.20);
-  --green: #34D399;
-  --blue: #60A5FA;
-  --yellow: #FACC15;
-  --red: #F87171;
-  --purple: #A78BFA;
-  --teal: #2DD4BF;
   --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --mono: 'Geist Mono', 'SF Mono', monospace;
   --r: 12px;
@@ -39,11 +19,69 @@
   --r-xs: 6px;
   --max: 1140px;
 }
+
+/* ═══════════════════════════════════════
+   DARK — dark red on black
+   ═══════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:      #0A0A0B;
+  --bg-1:    #111113;
+  --bg-2:    #181819;
+  --bg-3:    #222225;
+  --border:  #2A2A2E;
+  --border-h:#3A3A3F;
+  --t1:      #EEEEF0;
+  --t2:      #86868F;
+  --t3:      #4E4E56;
+  --t4:      #2C2C32;
+  --accent:  #C02838;
+  --accent-g: rgba(192,40,56,0.08);
+  /* chips — very muted */
+  --chip-amber-bg: rgba(192,140,40,0.07);  --chip-amber-bd: rgba(192,140,40,0.16);  --chip-amber-t: #9E7830;
+  --chip-sap-bg:   rgba(80,140,210,0.07);  --chip-sap-bd:   rgba(80,140,210,0.16);  --chip-sap-t:   #5080B8;
+  --chip-mint-bg:  rgba(40,168,150,0.07);  --chip-mint-bd:  rgba(40,168,150,0.16);  --chip-mint-t:  #309080;
+  --chip-violet-bg:rgba(140,110,200,0.07); --chip-violet-bd:rgba(140,110,200,0.16); --chip-violet-t:#7860A8;
+  /* stw tags */
+  --green:  #4AAE88; --blue: #5898C8; --yellow: #B8923A; --red: #C05868; --purple: #9478C0; --teal: #3AA090;
+  /* nav */
+  --nav-bg:  rgba(10,10,11,0.84);
+  --grain-op: 0.04;
+}
+
+/* ═══════════════════════════════════════
+   LIGHT — teal on off-white grey
+   ═══════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:      #F5F5F6;
+  --bg-1:    #EDEDEF;
+  --bg-2:    #E3E3E6;
+  --bg-3:    #D5D5DA;
+  --border:  #C4C4CB;
+  --border-h:#AAAAB2;
+  --t1:      #111114;
+  --t2:      #5C5C68;
+  --t3:      #8C8C98;
+  --t4:      #B4B4BE;
+  --accent:  #0B8A7A;
+  --accent-g: rgba(11,138,122,0.08);
+  /* chips — very muted */
+  --chip-amber-bg: rgba(140,90,0,0.06);    --chip-amber-bd: rgba(140,90,0,0.14);    --chip-amber-t: #806020;
+  --chip-sap-bg:   rgba(30,80,160,0.06);   --chip-sap-bd:   rgba(30,80,160,0.14);   --chip-sap-t:   #305890;
+  --chip-mint-bg:  rgba(11,138,122,0.06);  --chip-mint-bd:  rgba(11,138,122,0.14);  --chip-mint-t:  #0B8A7A;
+  --chip-violet-bg:rgba(90,60,160,0.06);   --chip-violet-bd:rgba(90,60,160,0.14);   --chip-violet-t:#503888;
+  /* stw tags */
+  --green:  #1A8060; --blue: #1A5490; --yellow: #806010; --red: #882030; --purple: #503888; --teal: #0B8A7A;
+  /* nav */
+  --nav-bg:  rgba(245,245,246,0.90);
+  --grain-op: 0.022;
+}
+
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--sans); background: var(--bg); color: var(--t1);
   -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.6; overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
 }
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--accent); color: #fff; }
@@ -53,25 +91,21 @@ img { display: block; max-width: 100%; }
    GRAIN OVERLAY
    ═══════════════════════════════════════ */
 .grain {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.035;
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  opacity: var(--grain-op, 0.035);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
+  background-repeat: repeat; background-size: 256px 256px;
 }
 
 /* ═══════════════════════════════════════
-   NAV — Raycast-style: frosted, minimal
+   NAV
    ═══════════════════════════════════════ */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px;
   display: flex; align-items: center; justify-content: center; padding: 0 24px;
-  background: rgba(9,9,11,0.72); backdrop-filter: saturate(180%) blur(20px);
+  background: var(--nav-bg); backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid transparent; transition: border-color 0.3s;
+  border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
 }
 .nav.scrolled { border-bottom-color: var(--border); }
 .nav-inner { width: 100%; max-width: var(--max); display: flex; align-items: center; justify-content: space-between; }
@@ -80,33 +114,50 @@ img { display: block; max-width: 100%; }
 .nav-links { display: flex; gap: 22px; }
 .nav-links a { font-size: 13px; font-weight: 500; color: var(--t3); transition: color 0.15s; }
 .nav-links a:hover { color: var(--t1); }
-.nav-right { display: flex; align-items: center; gap: 10px; }
-.btn {
-  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px;
-  border-radius: var(--r-xs); border: 1px solid var(--border); background: transparent;
-  color: var(--t2); cursor: pointer; transition: all 0.15s;
+.nav-right { display: flex; align-items: center; gap: 12px; }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 38px; height: 22px; border-radius: 100px;
+  background: var(--bg-3); border: 1.5px solid var(--border-h);
+  cursor: pointer; position: relative; transition: background 0.25s, border-color 0.25s;
+  flex-shrink: 0; padding: 0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
 }
-.btn:hover { border-color: var(--border-h); color: var(--t1); }
+.theme-toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+[data-theme="light"] .theme-toggle-thumb { transform: translateX(16px); }
+
+/* Buttons */
+.btn {
+  font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 7px 16px;
+  border-radius: var(--r-xs); border: 1px solid var(--border-h);
+  background: transparent; color: var(--t2);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.btn:hover { border-color: var(--t3); color: var(--t1); }
+
 .btn-a {
   font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px;
-  border-radius: var(--r-xs); border: 1px solid var(--accent); background: var(--accent);
-  color: #fff; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center;
+  border-radius: var(--r-xs); border: 1px solid transparent;
+  background: linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 82%, #000) 100%);
+  color: #fff; cursor: pointer; transition: opacity 0.15s; display: inline-flex; align-items: center;
 }
-.btn-a:hover { background: var(--accent-s); border-color: var(--accent-s); box-shadow: 0 0 28px var(--accent-g); }
+.btn-a:hover { opacity: 0.88; }
 
 /* ═══════════════════════════════════════
    HERO
    ═══════════════════════════════════════ */
 .hero { padding: 152px 24px 64px; text-align: center; position: relative; }
-.hero::after {
-  content:''; position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-  width: 700px; height: 700px; background: radial-gradient(circle, rgba(224,90,51,0.07) 0%, transparent 65%);
-  pointer-events: none; z-index: 0;
-}
 .hero > * { position: relative; z-index: 1; }
 .hero-pill {
   display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500;
-  color: var(--accent); background: var(--accent-g); border: 1px solid rgba(224,90,51,0.15);
+  color: var(--accent); background: var(--accent-g); border: 1px solid var(--accent-g2);
   border-radius: 100px; padding: 5px 14px 5px 10px; margin-bottom: 28px;
   animation: fadeUp 0.5s ease both;
 }
@@ -117,7 +168,7 @@ img { display: block; max-width: 100%; }
   line-height: 1.04; max-width: 800px; margin: 0 auto 24px; animation: fadeUp 0.5s ease 0.05s both;
 }
 .gr {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--yellow) 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 60%, #fff) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .hero-sub {
@@ -131,11 +182,9 @@ img { display: block; max-width: 100%; }
 @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
 
 /* ═══════════════════════════════════════
-   EMOTIONAL REFRAME — Raycast: "It's not about saving time..."
+   EMOTIONAL REFRAME
    ═══════════════════════════════════════ */
-.reframe {
-  padding: 100px 24px 0; text-align: center;
-}
+.reframe { padding: 100px 24px 0; text-align: center; }
 .reframe h2 {
   font-size: clamp(22px, 3vw, 32px); font-weight: 600; color: var(--t2); letter-spacing: -0.5px;
   line-height: 1.35; max-width: 580px; margin: 0 auto;
@@ -143,7 +192,7 @@ img { display: block; max-width: 100%; }
 .reframe h2 strong { color: var(--t1); font-weight: 700; }
 
 /* ═══════════════════════════════════════
-   4 PILLARS — Raycast: keyboard grid with value labels
+   4 PILLARS
    ═══════════════════════════════════════ */
 .pillars { padding: 72px 24px 0; }
 .pillars-grid {
@@ -162,10 +211,10 @@ img { display: block; max-width: 100%; }
 .pillar h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.2px; }
 .pillar p { font-size: 13px; color: var(--t2); line-height: 1.55; }
 
-.pi-orange { background: var(--accent-g); color: var(--accent); }
-.pi-green { background: rgba(52,211,153,0.1); color: var(--green); }
-.pi-blue { background: rgba(96,165,250,0.1); color: var(--blue); }
-.pi-yellow { background: rgba(250,204,21,0.1); color: var(--yellow); }
+.pi-orange { background: var(--bg-3); color: var(--accent); }
+.pi-green  { background: var(--bg-3); color: var(--t2); }
+.pi-blue   { background: var(--bg-3); color: var(--t2); }
+.pi-yellow { background: var(--bg-3); color: var(--t2); }
 
 /* ═══════════════════════════════════════
    DIVIDER / SECTION UTILITIES
@@ -177,11 +226,11 @@ img { display: block; max-width: 100%; }
 .sec-p { font-size: 16px; color: var(--t2); max-width: 520px; line-height: 1.6; }
 
 /* ═══════════════════════════════════════
-   SLIDE-TO-WORK — The killer ecosystem feature
+   SLIDE-TO-WORK
    ═══════════════════════════════════════ */
 .stw-visual {
   margin-top: 56px; background: var(--bg-1); border: 1px solid var(--border); border-radius: 14px;
-  overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 100px var(--accent-g);
+  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 .stw-bar {
   display: flex; align-items: center; height: 40px; padding: 0 16px;
@@ -207,7 +256,7 @@ img { display: block; max-width: 100%; }
   padding: 14px; margin-bottom: 10px; cursor: default; transition: border-color 0.15s;
 }
 .stw-slide:hover { border-color: var(--border-h); }
-.stw-slide.active { border-color: var(--accent); background: rgba(224,90,51,0.04); }
+.stw-slide.active { border-color: var(--accent); }
 .stw-slide-num { font-family: var(--mono); font-size: 10px; color: var(--t4); margin-bottom: 6px; }
 .stw-slide-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 .stw-slide-meta { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 8px; }
@@ -216,15 +265,6 @@ img { display: block; max-width: 100%; }
 .stw-slide-meta .dot.y { background: var(--yellow); }
 .stw-slide-meta .dot.r { background: var(--red); }
 
-/* Arrow connector */
-.stw-arrow {
-  display: flex; align-items: center; justify-content: center; position: relative;
-}
-.stw-arrow::before {
-  content: '→'; font-size: 20px; color: var(--accent); position: absolute;
-  left: -12px; top: 50%; transform: translateY(-50%);
-}
-
 /* Scope side */
 .stw-scope { padding: 24px; }
 .stw-scope-label {
@@ -232,14 +272,11 @@ img { display: block; max-width: 100%; }
   color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
 }
 .stw-scope-label::before { content:''; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
-.stw-scope-header {
-  font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px;
-}
+.stw-scope-header { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
 .stw-scope-sub { font-size: 12px; color: var(--t3); margin-bottom: 20px; }
 .stw-task {
   display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  animation: fadeUp 0.35s ease both;
+  border-bottom: 1px solid var(--border); animation: fadeUp 0.35s ease both;
 }
 .stw-task:last-child { border-bottom: none; }
 .stw-task:nth-child(3) { animation-delay: 0.1s; }
@@ -260,21 +297,16 @@ img { display: block; max-width: 100%; }
   font-family: var(--mono); font-size: 9px; font-weight: 500; padding: 2px 7px;
   border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
 }
-.tag-ws { background: rgba(96,165,250,0.1); color: var(--blue); }
-.tag-ai { background: rgba(167,139,250,0.1); color: var(--purple); }
-.tag-pr { background: rgba(250,204,21,0.1); color: var(--yellow); }
-.tag-bl { background: rgba(248,113,113,0.1); color: var(--red); }
-.tag-rv { background: rgba(45,212,191,0.1); color: var(--teal); }
+.tag-ws  { background: rgba(104,172,223,0.1); color: var(--blue); }
+.tag-ai  { background: rgba(168,136,216,0.1); color: var(--purple); }
+.tag-pr  { background: rgba(212,168,64,0.1);  color: var(--yellow); }
+.tag-bl  { background: rgba(216,104,120,0.1); color: var(--red); }
+.tag-rv  { background: rgba(68,184,168,0.1);  color: var(--teal); }
 
 /* ═══════════════════════════════════════
-   AI DELEGATION — Raycast AI section energy
+   AI DELEGATION
    ═══════════════════════════════════════ */
 .ai-section { position: relative; }
-.ai-section::before {
-  content:''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 65%);
-  pointer-events: none;
-}
 .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
 .ai-card {
   background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
@@ -284,13 +316,13 @@ img { display: block; max-width: 100%; }
 .ai-card .ai-icon {
   width: 32px; height: 32px; border-radius: var(--r-s); margin-bottom: 16px;
   display: flex; align-items: center; justify-content: center; font-size: 14px;
-  background: rgba(167,139,250,0.1); color: var(--purple);
+  background: var(--bg-3); color: var(--t2);
 }
 .ai-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .ai-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
 
 /* ═══════════════════════════════════════
-   USE CASES — Raycast extensions showcase energy
+   USE CASES
    ═══════════════════════════════════════ */
 .uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
 .uc-card {
@@ -298,22 +330,37 @@ img { display: block; max-width: 100%; }
   padding: 28px; transition: border-color 0.2s, transform 0.2s;
 }
 .uc-card:hover { border-color: var(--border-h); transform: translateY(-2px); }
-.uc-card .uc-icon {
-  font-size: 24px; margin-bottom: 16px;
+
+/* Monochrome icon blocks for use cases */
+.uc-icon-sym {
+  width: 36px; height: 36px; border-radius: var(--r-s); margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; font-family: var(--sans);
+  background: var(--bg-3); border: 1px solid var(--border); color: var(--t2);
 }
+/* subtle per-card tint on icon */
+.uc-amber  { color: var(--chip-amber-t); }
+.uc-sap    { color: var(--chip-sap-t); }
+.uc-mint   { color: var(--chip-mint-t); }
+.uc-violet { color: var(--chip-violet-t); }
+
 .uc-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-.uc-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
-.uc-card .uc-flow {
-  margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px;
-}
+.uc-card p  { font-size: 13px; color: var(--t2); line-height: 1.6; }
+.uc-card .uc-flow { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Base chip */
 .uc-flow-tag {
-  font-family: var(--mono); font-size: 10px; color: var(--t3);
-  background: var(--bg); border: 1px solid var(--border); padding: 3px 9px;
-  border-radius: 4px;
+  font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 3px 9px;
+  border-radius: 4px; letter-spacing: 0.3px; border: 1px solid transparent;
 }
+/* Per-card hues — very muted */
+.uc-flow-tag.c-amber   { background: var(--chip-amber-bg);  color: var(--chip-amber-t);  border-color: var(--chip-amber-bd); }
+.uc-flow-tag.c-sap     { background: var(--chip-sap-bg);    color: var(--chip-sap-t);    border-color: var(--chip-sap-bd); }
+.uc-flow-tag.c-mint    { background: var(--chip-mint-bg);   color: var(--chip-mint-t);   border-color: var(--chip-mint-bd); }
+.uc-flow-tag.c-violet  { background: var(--chip-violet-bg); color: var(--chip-violet-t); border-color: var(--chip-violet-bd); }
 
 /* ═══════════════════════════════════════
-   ECOSYSTEM — Album OS + Scope Creep + Bad Actors
+   ECOSYSTEM
    ═══════════════════════════════════════ */
 .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
 .eco-card {
@@ -323,29 +370,23 @@ img { display: block; max-width: 100%; }
 .eco-card::before {
   content:''; position: absolute; top: 0; left: 0; right: 0; height: 100px; pointer-events: none;
 }
-.eco-card.c-blue::before { background: linear-gradient(180deg, rgba(96,165,250,0.06) 0%, transparent 100%); }
-.eco-card.c-orange::before { background: linear-gradient(180deg, rgba(224,90,51,0.06) 0%, transparent 100%); }
-.eco-card.c-purple::before { background: linear-gradient(180deg, rgba(167,139,250,0.06) 0%, transparent 100%); }
-.eco-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px;
-}
-.eco-card.c-blue .eco-label { color: var(--blue); }
+.eco-card.c-blue::before   { background: none; }
+.eco-card.c-orange::before { background: none; }
+.eco-card.c-purple::before { background: none; }
+.eco-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+.eco-card.c-blue   .eco-label { color: var(--blue); }
 .eco-card.c-orange .eco-label { color: var(--accent); }
 .eco-card.c-purple .eco-label { color: var(--purple); }
 .eco-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; line-height: 1.3; }
-.eco-card p { font-size: 13px; color: var(--t2); line-height: 1.6; }
+.eco-card p  { font-size: 13px; color: var(--t2); line-height: 1.6; }
 
 /* ═══════════════════════════════════════
-   FEATURE SPREAD — Raycast "What else can it do?" energy
+   FEATURE SPREAD
    ═══════════════════════════════════════ */
-.spread {
-  padding: 80px 24px 120px; text-align: center; max-width: var(--max); margin: 0 auto;
-}
+.spread { padding: 80px 24px 120px; text-align: center; max-width: var(--max); margin: 0 auto; }
 .spread-title { font-size: 20px; font-weight: 600; color: var(--t2); margin-bottom: 24px; }
 .spread-title strong { color: var(--t1); }
-.spread-cloud {
-  font-size: 15px; color: var(--t3); line-height: 2.2; max-width: 800px; margin: 0 auto;
-}
+.spread-cloud { font-size: 15px; color: var(--t3); line-height: 2.2; max-width: 800px; margin: 0 auto; }
 .spread-cloud span {
   display: inline-block; padding: 4px 14px; margin: 3px;
   background: var(--bg-2); border: 1px solid var(--border); border-radius: 100px;
@@ -357,14 +398,8 @@ img { display: block; max-width: 100%; }
 /* ═══════════════════════════════════════
    CTA
    ═══════════════════════════════════════ */
-.cta { padding: 120px 24px 160px; text-align: center; position: relative; }
-.cta::before {
-  content:''; position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-  width: 800px; height: 500px;
-  background: radial-gradient(ellipse at center bottom, rgba(224,90,51,0.06) 0%, transparent 55%);
-  pointer-events: none;
-}
-.cta > * { position: relative; z-index: 1; }
+.cta { padding: 120px 24px 160px; text-align: center; }
+.cta > * { position: relative; }
 .cta h2 {
   font-size: clamp(32px, 4.5vw, 52px); font-weight: 700; letter-spacing: -1.2px;
   line-height: 1.1; max-width: 640px; margin: 0 auto 16px;
@@ -372,7 +407,7 @@ img { display: block; max-width: 100%; }
 .cta p { font-size: 16px; color: var(--t3); margin-bottom: 36px; }
 .cta-actions { display: flex; justify-content: center; gap: 12px; }
 .cta-actions .btn-a { padding: 12px 28px; font-size: 14px; }
-.cta-actions .btn { padding: 12px 24px; font-size: 14px; }
+.cta-actions .btn   { padding: 12px 24px; font-size: 14px; }
 
 /* ═══════════════════════════════════════
    FOOTER
@@ -422,6 +457,9 @@ img { display: block; max-width: 100%; }
       </div>
     </div>
     <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle colour theme">
+        <span class="theme-toggle-thumb"></span>
+      </button>
       <button class="btn">Log in</button>
       <a href="#cta" class="btn-a">Get early access</a>
     </div>
@@ -619,35 +657,51 @@ img { display: block; max-width: 100%; }
   <div class="sec-p">Not project management theory. Real workflows for people who ship.</div>
   <div class="uc-grid">
     <div class="uc-card">
-      <div class="uc-icon">🚀</div>
+      <div class="uc-icon-sym uc-amber">↗</div>
       <h3>Product launch</h3>
       <p>Album holds your launch deck. Scope Creep generates tasks for copy, visuals, landing page, pricing, launch email, demo video, and FAQ — all tied to slides.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag">copy</span><span class="uc-flow-tag">visuals</span><span class="uc-flow-tag">landing</span><span class="uc-flow-tag">pricing</span><span class="uc-flow-tag">email</span><span class="uc-flow-tag">video</span>
+        <span class="uc-flow-tag c-amber">copy</span>
+        <span class="uc-flow-tag c-amber">visuals</span>
+        <span class="uc-flow-tag c-amber">landing</span>
+        <span class="uc-flow-tag c-amber">pricing</span>
+        <span class="uc-flow-tag c-amber">email</span>
+        <span class="uc-flow-tag c-amber">video</span>
       </div>
     </div>
     <div class="uc-card">
-      <div class="uc-icon">🎨</div>
+      <div class="uc-icon-sym uc-sap">◈</div>
       <h3>Design system</h3>
       <p>Album structures components and principles. Scope Creep turns them into audit tasks, token definitions, variant creation, docs, and engineering handoff.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag">audit</span><span class="uc-flow-tag">tokens</span><span class="uc-flow-tag">variants</span><span class="uc-flow-tag">docs</span><span class="uc-flow-tag">handoff</span>
+        <span class="uc-flow-tag c-sap">audit</span>
+        <span class="uc-flow-tag c-sap">tokens</span>
+        <span class="uc-flow-tag c-sap">variants</span>
+        <span class="uc-flow-tag c-sap">docs</span>
+        <span class="uc-flow-tag c-sap">handoff</span>
       </div>
     </div>
     <div class="uc-card">
-      <div class="uc-icon">📹</div>
+      <div class="uc-icon-sym uc-mint">▶</div>
       <h3>Content pipeline</h3>
       <p>Album stores content cards. Scope Creep manages scripting, shot lists, AI visual generation, editing, review, and publishing sequence.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag">script</span><span class="uc-flow-tag">shots</span><span class="uc-flow-tag">AI gen</span><span class="uc-flow-tag">edit</span><span class="uc-flow-tag">publish</span>
+        <span class="uc-flow-tag c-mint">script</span>
+        <span class="uc-flow-tag c-mint">shots</span>
+        <span class="uc-flow-tag c-mint">AI gen</span>
+        <span class="uc-flow-tag c-mint">edit</span>
+        <span class="uc-flow-tag c-mint">publish</span>
       </div>
     </div>
     <div class="uc-card">
-      <div class="uc-icon">📋</div>
+      <div class="uc-icon-sym uc-violet">≡</div>
       <h3>Product spec</h3>
       <p>Album holds the spec narrative. Scope Creep handles requirements drafting, dependency mapping, developer clarifications, QA checklist, and release prep.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag">requirements</span><span class="uc-flow-tag">deps</span><span class="uc-flow-tag">QA</span><span class="uc-flow-tag">release</span>
+        <span class="uc-flow-tag c-violet">requirements</span>
+        <span class="uc-flow-tag c-violet">deps</span>
+        <span class="uc-flow-tag c-violet">QA</span>
+        <span class="uc-flow-tag c-violet">release</span>
       </div>
     </div>
   </div>
@@ -727,13 +781,38 @@ img { display: block; max-width: 100%; }
 </footer>
 
 <script>
+/* ── Theme toggle ── */
+const html    = document.documentElement;
+const toggle  = document.getElementById('themeToggle');
+
+// Honour system preference on first load, then localStorage
+const stored  = localStorage.getItem('theme');
+const prefer  = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+html.dataset.theme = stored || prefer;
+
+toggle.addEventListener('click', () => {
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  localStorage.setItem('theme', next);
+});
+
+/* ── Nav scroll border ── */
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+/* ── Scroll-in animations ── */
 const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; } });
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
 }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+
 document.querySelectorAll('.pillar, .ai-card, .uc-card, .eco-card, .spread-cloud span').forEach((el, i) => {
-  el.style.opacity = '0'; el.style.transform = 'translateY(14px)';
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(14px)';
   el.style.transition = `opacity 0.4s ease ${i * 0.04}s, transform 0.4s ease ${i * 0.04}s`;
   io.observe(el);
 });
