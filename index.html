@@ -159,14 +159,11 @@ img { display: block; max-width: 100%; }
 .hero > * { position: relative; z-index: 1; }
 .hero-pill {
   display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500;
-  color: var(--c-blue); background: var(--bg-2);
-  border: 1px solid rgba(26,72,200,0.30);
+  color: var(--t3); background: var(--bg-1);
+  border: 1px solid var(--border);
   border-radius: 100px; padding: 5px 14px 5px 10px; margin-bottom: 28px;
 }
-[data-theme="dark"] .hero-pill {
-  border-color: rgba(88,136,232,0.30);
-}
-.hero-pill-dot { width: 5px; height: 5px; background: var(--c-blue); border-radius: 50%; }
+.hero-pill-dot { width: 5px; height: 5px; background: var(--c-red); border-radius: 50%; }
 .hero h1 {
   font-size: clamp(40px, 6.2vw, 74px); font-weight: 700; letter-spacing: -2px;
   line-height: 1.04; max-width: 800px; margin: 0 auto 24px;
@@ -188,8 +185,8 @@ img { display: block; max-width: 100%; }
    ═══════════════════════════════════════ */
 .reframe { padding: 100px 24px 0; text-align: center; }
 .reframe h2 {
-  font-size: clamp(22px, 3vw, 32px); font-weight: 600; color: var(--t2); letter-spacing: -0.5px;
-  line-height: 1.35; max-width: 580px; margin: 0 auto;
+  font-size: clamp(18px, 2.4vw, 26px); font-weight: 500; color: var(--t2); letter-spacing: -0.3px;
+  line-height: 1.5; max-width: 680px; margin: 0 auto;
 }
 .reframe h2 strong { color: var(--t1); font-weight: 700; }
 
@@ -202,7 +199,7 @@ img { display: block; max-width: 100%; }
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
 }
 .pillar {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
   padding: 28px 24px; text-align: center;
   transform-origin: center bottom; will-change: transform;
 }
@@ -213,11 +210,23 @@ img { display: block; max-width: 100%; }
 .pillar h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.2px; }
 .pillar p { font-size: 13px; color: var(--t2); line-height: 1.55; }
 
-/* Pillar icon Bauhaus colors */
-.pi-orange { color: var(--c-blue); }   /* pillar 1 → blue */
-.pi-green  { color: var(--c-red); }    /* pillar 2 → red */
-.pi-blue   { color: var(--c-yellow); } /* pillar 3 → yellow */
-.pi-yellow { color: var(--c-red); }    /* pillar 4 → red */
+/* Pillar icon Bauhaus colors — icons only */
+.pi-orange { color: var(--c-blue); }
+.pi-green  { color: var(--c-red); }
+.pi-blue   { color: var(--c-yellow); }
+.pi-yellow { color: var(--c-red); }
+
+/* AI card icon Bauhaus colors — icons only */
+.ai-card:nth-child(1) .ai-icon { color: var(--c-blue); }
+.ai-card:nth-child(2) .ai-icon { color: var(--c-red); }
+.ai-card:nth-child(3) .ai-icon { color: var(--c-yellow); }
+.ai-card:nth-child(4) .ai-icon { color: var(--c-red); }
+
+/* UC card icon Bauhaus colors — icons only */
+.uc-card:nth-child(1) .uc-icon-sym { color: var(--c-red); }
+.uc-card:nth-child(2) .uc-icon-sym { color: var(--c-blue); }
+.uc-card:nth-child(3) .uc-icon-sym { color: var(--c-yellow); }
+.uc-card:nth-child(4) .uc-icon-sym { color: var(--c-blue); }
 
 /* ═══════════════════════════════════════
    DIVIDER / SECTION UTILITIES
@@ -229,10 +238,8 @@ img { display: block; max-width: 100%; }
   margin-bottom: 14px; display: inline-block;
 }
 
-/* Section tag Bauhaus colors */
-.sec-tag-blue   { color: var(--c-blue); }
-.sec-tag-yellow { color: var(--c-yellow); }
-.sec-tag-red    { color: var(--c-red); }
+/* Section tags — neutral, no primary colors */
+.sec-tag-blue, .sec-tag-yellow, .sec-tag-red { color: var(--t3); }
 
 .sec-h { font-size: clamp(28px, 3.5vw, 40px); font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 14px; }
 .sec-p { font-size: 16px; color: var(--t2); max-width: 520px; line-height: 1.6; }
@@ -356,7 +363,7 @@ img { display: block; max-width: 100%; }
 .ai-section { position: relative; }
 .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
 .ai-card {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
   padding: 28px;
 }
 .ai-card .ai-icon {
@@ -386,7 +393,7 @@ img { display: block; max-width: 100%; }
 }
 .aj-sidebar-label::before { content:''; width: 5px; height: 5px; background: var(--t3); border-radius: 50%; }
 .aj-job {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-s);
   padding: 12px 14px; margin-bottom: 8px; cursor: default; transition: border-color 0.15s;
 }
 .aj-job:hover { border-color: var(--border-h); }
@@ -451,7 +458,7 @@ img { display: block; max-width: 100%; }
    ═══════════════════════════════════════ */
 .uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
 .uc-card {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
   padding: 28px;
 }
 
@@ -505,16 +512,16 @@ img { display: block; max-width: 100%; }
 .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
 .eco-card {
   border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
-  background: var(--bg-2);
+  background: var(--bg-1);
 }
 .eco-card::before { display: none; }
 .eco-label {
   font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.2px;
   margin-bottom: 12px;
 }
-.eco-card.c-blue   .eco-label { color: var(--c-blue); }
-.eco-card.c-orange .eco-label { color: var(--c-red); }
-.eco-card.c-purple .eco-label { color: var(--c-yellow); }
+.eco-card.c-blue   .eco-label,
+.eco-card.c-orange .eco-label,
+.eco-card.c-purple .eco-label { color: var(--t3); }
 .eco-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; line-height: 1.3; }
 .eco-card p  { font-size: 13px; color: var(--t2); line-height: 1.6; }
 
@@ -529,7 +536,7 @@ img { display: block; max-width: 100%; }
 .scope-warn {
   border: 1px solid var(--border); border-radius: var(--r-s);
   padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px;
-  background: var(--bg-2); position: relative; overflow: hidden;
+  background: var(--bg-1); position: relative; overflow: hidden;
 }
 .scope-warn-stripe {
   width: 3px; min-height: 100%; border-radius: 2px; flex-shrink: 0; align-self: stretch;
@@ -639,19 +646,19 @@ img { display: block; max-width: 100%; }
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
-  <div class="hero-pill"><span class="hero-pill-dot"></span> The execution engine for creative work</div>
-  <h1>Your shortcut to <span class="gr">shipping.</span></h1>
-  <p class="hero-sub">Turn projects, slides, and deliverables into structured tasks, AI-assisted workflows, and real momentum. Built for creative builders who think in systems.</p>
+  <div class="hero-pill"><span class="hero-pill-dot"></span> Work management for creative builders</div>
+  <h1>Stop drifting.<br>Start shipping.</h1>
+  <p class="hero-sub">Deliverable-driven planning, AI delegation, and scope drift detection. Built for creative work — not engineering sprints.</p>
   <div class="hero-cta">
     <a href="#cta" class="btn-a">Request early access</a>
     <a href="#how" class="btn">See how it works</a>
   </div>
-  <p class="hero-meta">Part of the Album OS ecosystem · For builders, designers, and small teams</p>
+  <p class="hero-meta">For builders, designers, and small teams · Works standalone or inside Album OS</p>
 </section>
 
 <!-- ═══ EMOTIONAL REFRAME ═══ -->
 <section class="reframe">
-  <h2>It's not about managing tasks.<br><strong>It's about never losing momentum.</strong></h2>
+  <h2>You started with a clear plan. Then requests crept in. Context got lost. Deadlines slipped.<br><strong>Scope creep kills creative projects. We built the fix.</strong></h2>
 </section>
 
 <!-- ═══ 4 PILLARS ═══ -->
@@ -659,23 +666,23 @@ img { display: block; max-width: 100%; }
   <div class="pillars-grid">
     <div class="pillar glow-card">
       <div class="pillar-icon pi-orange"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></div>
-      <h3>Context-first.</h3>
-      <p>Every task knows why it exists, what project it belongs to, and what output is expected.</p>
+      <h3>Deliverable-driven.</h3>
+      <p>Tasks come from what you're making — decks, pages, prototypes. Not abstract tickets invented from a backlog.</p>
     </div>
     <div class="pillar glow-card">
       <div class="pillar-icon pi-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-      <h3>Deliverable-driven.</h3>
-      <p>Work stays attached to real outputs — decks, prototypes, pages, specs. Not floating checkboxes.</p>
+      <h3>Context-packed.</h3>
+      <p>Every delegation ships with everything needed. No back-and-forth. No "can you explain what you need?"</p>
     </div>
     <div class="pillar glow-card">
       <div class="pillar-icon pi-blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
       <h3>AI-delegated.</h3>
-      <p>Delegate to agents with full project context. Not generic prompts — structured execution.</p>
+      <p>Assign to agents with full context packs. Not a freeform prompt — a structured job with a real brief.</p>
     </div>
     <div class="pillar glow-card">
       <div class="pillar-icon pi-yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
-      <h3>Scope-aware.</h3>
-      <p>See when work is expanding. Scope drift detection makes the invisible visible.</p>
+      <h3>Drift-detected.</h3>
+      <p>AI flags when your project grows beyond its original scope. Named after the exact problem it solves.</p>
     </div>
   </div>
 </section>
@@ -685,8 +692,8 @@ img { display: block; max-width: 100%; }
 <!-- ═══ SLIDE-TO-WORK ═══ -->
 <section class="sec" id="how">
   <div class="sec-tag sec-tag-blue">How it works</div>
-  <div class="sec-h">Every slide becomes a work dashboard.</div>
-  <div class="sec-p">Album OS structures your project as slides and artifacts. Scope Creep turns each one into executable tasks, assignments, and agent jobs — bidirectionally synced.</div>
+  <div class="sec-h">Your brief generates its own task list.</div>
+  <div class="sec-p">Connect a deck, brief, or project outline. Scope Creep reads each deliverable and spawns task clusters for it — copy, design, dev, review. You edit, not create from scratch.</div>
 
   <div class="stw-visual">
     <div class="stw-bar">
@@ -1061,8 +1068,8 @@ img { display: block; max-width: 100%; }
 
 <!-- ═══ FOOTER ═══ -->
 <footer class="footer">
-  <div class="footer-l">© 2026 Scope Creep · Part of the Album OS ecosystem</div>
-  <div class="footer-r"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">Discord</a></div>
+  <div class="footer-l">© 2026 Scope Creep · Built by Naren · <a href="mailto:hello@scopecreep.app" style="color:inherit">hello@scopecreep.app</a></div>
+  <div class="footer-r"><a href="#">Twitter</a><a href="#">Privacy</a><a href="#">Terms</a></div>
 </footer>
 
 <script>
@@ -1107,29 +1114,24 @@ gsap.from('.reframe h2', {
   opacity: 0, y: 32, duration: 0.9, ease: 'power3.out'
 });
 
-/* ── Pillars: scrub-based float so they drift into scattered positions on scroll ── */
-const pillarRots   = [-2.2,  1.4, -0.9,  2.1];
-const pillarYFinal = [  10,   -8,    5,  -10];
-
+/* ── Pillars: truly asymmetric scatter — each card has unique x, y, rotation ── */
+const pillarScatter = [
+  { fromX: -58, fromY: 85, fromRot: -5.1, toRot: -2.4, toY: 14 },
+  { fromX:  22, fromY: 110,fromRot:  4.3, toRot:  3.0, toY: -16 },
+  { fromX: -12, fromY: 65, fromRot: -1.2, toRot: -0.5, toY:  9 },
+  { fromX:  70, fromY: 92, fromRot:  3.8, toRot:  2.1, toY: -6 },
+];
 document.querySelectorAll('.pillar').forEach((el, i) => {
+  const s = pillarScatter[i];
   gsap.fromTo(el,
-    /* from: scattered start */
-    { opacity: 0, y: 60 + Math.abs(pillarYFinal[i]), x: i % 2 === 0 ? -40 : 40, rotation: pillarRots[i] * 0.4 },
-    /* to: settled scattered position */
-    {
-      opacity: 1, y: pillarYFinal[i], x: 0, rotation: pillarRots[i],
+    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
+    { opacity: 1, y: s.toY,   x: 0,       rotation: s.toRot,
       ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.pillars',
-        start: 'top 85%',
-        end: 'center 60%',
-        scrub: 0.8
-      }
+      scrollTrigger: { trigger: '.pillars', start: 'top 85%', end: 'center 58%', scrub: 0.9 }
     }
   );
-  /* Hover interaction: straighten on hover, restore on leave */
-  el.addEventListener('mouseenter', () => gsap.to(el, { rotation: 0, y: -6, duration: 0.35, ease: 'power2.out' }));
-  el.addEventListener('mouseleave', () => gsap.to(el, { rotation: pillarRots[i], y: pillarYFinal[i], duration: 0.45, ease: 'power2.inOut' }));
+  el.addEventListener('mouseenter', () => gsap.to(el, { rotation: 0, y: -5, duration: 0.3, ease: 'power2.out' }));
+  el.addEventListener('mouseleave', () => gsap.to(el, { rotation: s.toRot, y: s.toY, duration: 0.45, ease: 'power2.inOut' }));
 });
 
 /* ── Section text reveals ── */
@@ -1161,14 +1163,20 @@ if (stwVisual) {
   stwTl.to('.stw-check.done', { scale: 1, stagger: 0.15, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '+=0.2');
 }
 
-/* ── AI cards: scrub float ── */
+/* ── AI cards: asymmetric scatter ── */
+const aiScatter = [
+  { fromX: -45, fromY: 70, fromRot: -3.2 },
+  { fromX:  18, fromY: 95, fromRot:  2.7 },
+  { fromX: -30, fromY: 60, fromRot:  1.4 },
+  { fromX:  55, fromY: 80, fromRot: -2.9 },
+];
 document.querySelectorAll('.ai-card').forEach((el, i) => {
+  const s = aiScatter[i % aiScatter.length];
   gsap.fromTo(el,
-    { opacity: 0, y: 80, x: i % 2 === 0 ? -30 : 30, rotation: i % 2 === 0 ? -3 : 3 },
-    {
-      opacity: 1, y: 0, x: 0, rotation: 0,
+    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
+    { opacity: 1, y: 0, x: 0, rotation: 0,
       ease: 'power2.out',
-      scrollTrigger: { trigger: '.ai-grid', start: 'top 82%', end: 'center 60%', scrub: 0.6 }
+      scrollTrigger: { trigger: '.ai-grid', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
     }
   );
 });
@@ -1188,26 +1196,37 @@ if (ajVisual) {
   ajTl.to('.aj-detail', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.25');
 }
 
-/* ── Use case cards: scrub float ── */
+/* ── Use case cards: asymmetric scatter ── */
+const ucScatter = [
+  { fromX: -60, fromY: 75, fromRot:  4.1 },
+  { fromX:  35, fromY: 100,fromRot: -1.8 },
+  { fromX: -20, fromY: 55, fromRot:  2.3 },
+  { fromX:  48, fromY: 85, fromRot: -3.5 },
+];
 document.querySelectorAll('.uc-card').forEach((el, i) => {
+  const s = ucScatter[i % ucScatter.length];
   gsap.fromTo(el,
-    { opacity: 0, y: 80, x: i % 2 === 0 ? -30 : 30, rotation: i % 2 === 0 ? -3 : 3 },
-    {
-      opacity: 1, y: 0, x: 0, rotation: 0,
+    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
+    { opacity: 1, y: 0, x: 0, rotation: 0,
       ease: 'power2.out',
-      scrollTrigger: { trigger: '.uc-grid', start: 'top 82%', end: 'center 60%', scrub: 0.6 }
+      scrollTrigger: { trigger: '.uc-grid', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
     }
   );
 });
 
-/* ── Ecosystem cards: scrub float ── */
+/* ── Ecosystem cards: asymmetric scatter ── */
+const ecoScatter = [
+  { fromX: -70, fromY: 80, fromRot:  3.6 },
+  { fromX:   8, fromY: 105,fromRot: -0.9 },
+  { fromX:  52, fromY: 68, fromRot:  2.8 },
+];
 document.querySelectorAll('.eco-card').forEach((el, i) => {
+  const s = ecoScatter[i % ecoScatter.length];
   gsap.fromTo(el,
-    { opacity: 0, y: 80, x: (i - 1) * 30, rotation: (i - 1) * 3 },
-    {
-      opacity: 1, y: 0, x: 0, rotation: 0,
+    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
+    { opacity: 1, y: 0, x: 0, rotation: 0,
       ease: 'power2.out',
-      scrollTrigger: { trigger: '.eco-grid', start: 'top 82%', end: 'center 60%', scrub: 0.6 }
+      scrollTrigger: { trigger: '.eco-grid', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
     }
   );
 });
