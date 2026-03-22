@@ -87,7 +87,7 @@ img { display: block; max-width: 100%; }
    APPLE GLOW CARD
    ═══════════════════════════════════════ */
 .glow-card, .ai-row {
-  position: relative; overflow: hidden;
+  position: relative;
   transition: border-color 0.25s, box-shadow 0.35s cubic-bezier(0.34,1.3,0.64,1);
 }
 .glow-card::before, .ai-row::before {
@@ -185,7 +185,7 @@ img { display: block; max-width: 100%; }
 /* ═══════════════════════════════════════
    EMOTIONAL REFRAME
    ═══════════════════════════════════════ */
-.reframe { padding: 100px 24px 0; text-align: center; }
+.reframe { padding: 100px 24px 80px; text-align: center; }
 .reframe h2 {
   font-size: clamp(18px, 2.4vw, 26px); font-weight: 500; color: var(--t2); letter-spacing: -0.3px;
   line-height: 1.5; max-width: 680px; margin: 0 auto;
@@ -195,17 +195,17 @@ img { display: block; max-width: 100%; }
 /* ═══════════════════════════════════════
    4 PILLARS
    ═══════════════════════════════════════ */
-.pillars { padding: 72px 24px 0; }
+.pillars { padding: 80px 24px 100px; }
 .pillars-grid {
   max-width: var(--max); margin: 0 auto;
   display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 1px; background: var(--border);
-  border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;
+  gap: 16px;
 }
 .pillar {
-  background: var(--bg); padding: 44px 40px 40px;
-  text-align: left; position: relative; min-height: 210px;
-  transform-origin: center bottom; will-change: transform;
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 44px 40px 40px;
+  text-align: left; position: relative; min-height: 220px;
+  transition: box-shadow 0.25s, transform 0.25s;
 }
 /* Left Bauhaus color stripe */
 .pillar::after {
@@ -509,7 +509,7 @@ img { display: block; max-width: 100%; }
    ═══════════════════════════════════════ */
 .uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
 .uc-card {
-  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
   padding: 32px 28px 28px; position: relative; overflow: hidden;
 }
 /* Ghost background number */
@@ -572,7 +572,7 @@ img { display: block; max-width: 100%; }
 .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
 .eco-card {
   border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
-  background: var(--bg-1); position: relative; overflow: hidden;
+  background: var(--bg-2); position: relative; overflow: hidden;
 }
 .eco-card::before { display: none; }
 .eco-card::after {
@@ -772,7 +772,7 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<div class="div" style="margin-top: 100px;"></div>
+<div class="div"></div>
 
 <!-- ═══ SLIDE-TO-WORK ═══ -->
 <section class="sec" id="how">
@@ -1228,24 +1228,16 @@ gsap.from('.reframe h2', {
   opacity: 0, y: 32, duration: 0.9, ease: 'power3.out'
 });
 
-/* ── Pillars: truly asymmetric scatter — each card has unique x, y, rotation ── */
-const pillarScatter = [
-  { fromX: -58, fromY: 85, fromRot: -5.1, toRot: -2.4, toY: 14 },
-  { fromX:  22, fromY: 110,fromRot:  4.3, toRot:  3.0, toY: -16 },
-  { fromX: -12, fromY: 65, fromRot: -1.2, toRot: -0.5, toY:  9 },
-  { fromX:  70, fromY: 92, fromRot:  3.8, toRot:  2.1, toY: -6 },
-];
+/* ── Pillars: stagger fade-up, no rotation or scrub ── */
 document.querySelectorAll('.pillar').forEach((el, i) => {
-  const s = pillarScatter[i];
-  gsap.fromTo(el,
-    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
-    { opacity: 1, y: s.toY,   x: 0,       rotation: s.toRot,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: '.pillars', start: 'top 85%', end: 'center 58%', scrub: 0.9 }
-    }
-  );
-  el.addEventListener('mouseenter', () => gsap.to(el, { rotation: 0, y: -5, duration: 0.3, ease: 'power2.out' }));
-  el.addEventListener('mouseleave', () => gsap.to(el, { rotation: s.toRot, y: s.toY, duration: 0.45, ease: 'power2.inOut' }));
+  gsap.from(el, {
+    scrollTrigger: { trigger: '.pillars-grid', start: 'top 80%', once: true },
+    opacity: 0, y: 40 + i * 8,
+    delay: i * 0.09,
+    duration: 0.72, ease: 'power3.out'
+  });
+  el.addEventListener('mouseenter', () => gsap.to(el, { y: -4, duration: 0.25, ease: 'power2.out' }));
+  el.addEventListener('mouseleave', () => gsap.to(el, { y: 0, duration: 0.35, ease: 'power2.inOut' }));
 });
 
 /* ── Section text reveals ── */
@@ -1277,22 +1269,14 @@ if (stwVisual) {
   stwTl.to('.stw-check.done', { scale: 1, stagger: 0.15, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '+=0.2');
 }
 
-/* ── AI rows: asymmetric scatter ── */
-const aiScatter = [
-  { fromX: -45, fromY: 70, fromRot: -3.2 },
-  { fromX:  18, fromY: 95, fromRot:  2.7 },
-  { fromX: -30, fromY: 60, fromRot:  1.4 },
-  { fromX:  55, fromY: 80, fromRot: -2.9 },
-];
+/* ── AI rows: stagger fade-up ── */
 document.querySelectorAll('.ai-row').forEach((el, i) => {
-  const s = aiScatter[i % aiScatter.length];
-  gsap.fromTo(el,
-    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
-    { opacity: 1, y: 0, x: 0, rotation: 0,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: '.ai-list', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
-    }
-  );
+  gsap.from(el, {
+    scrollTrigger: { trigger: '.ai-list', start: 'top 82%', once: true },
+    opacity: 0, y: 28,
+    delay: i * 0.1,
+    duration: 0.65, ease: 'power3.out'
+  });
 });
 
 /* ── Agent Jobs mockup timeline ── */
@@ -1310,39 +1294,24 @@ if (ajVisual) {
   ajTl.to('.aj-detail', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.25');
 }
 
-/* ── Use case cards: asymmetric scatter ── */
-const ucScatter = [
-  { fromX: -60, fromY: 75, fromRot:  4.1 },
-  { fromX:  35, fromY: 100,fromRot: -1.8 },
-  { fromX: -20, fromY: 55, fromRot:  2.3 },
-  { fromX:  48, fromY: 85, fromRot: -3.5 },
-];
+/* ── Use case cards: stagger fade-up ── */
 document.querySelectorAll('.uc-card').forEach((el, i) => {
-  const s = ucScatter[i % ucScatter.length];
-  gsap.fromTo(el,
-    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
-    { opacity: 1, y: 0, x: 0, rotation: 0,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: '.uc-grid', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
-    }
-  );
+  gsap.from(el, {
+    scrollTrigger: { trigger: '.uc-grid', start: 'top 82%', once: true },
+    opacity: 0, y: 36,
+    delay: i * 0.1,
+    duration: 0.65, ease: 'power3.out'
+  });
 });
 
-/* ── Ecosystem cards: asymmetric scatter ── */
-const ecoScatter = [
-  { fromX: -70, fromY: 80, fromRot:  3.6 },
-  { fromX:   8, fromY: 105,fromRot: -0.9 },
-  { fromX:  52, fromY: 68, fromRot:  2.8 },
-];
+/* ── Ecosystem cards: stagger fade-up ── */
 document.querySelectorAll('.eco-card').forEach((el, i) => {
-  const s = ecoScatter[i % ecoScatter.length];
-  gsap.fromTo(el,
-    { opacity: 0, y: s.fromY, x: s.fromX, rotation: s.fromRot },
-    { opacity: 1, y: 0, x: 0, rotation: 0,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: '.eco-grid', start: 'top 82%', end: 'center 58%', scrub: 0.7 }
-    }
-  );
+  gsap.from(el, {
+    scrollTrigger: { trigger: '.eco-grid', start: 'top 82%', once: true },
+    opacity: 0, y: 32,
+    delay: i * 0.12,
+    duration: 0.65, ease: 'power3.out'
+  });
 });
 
 /* ── Scope detection warnings stagger ── */
@@ -1355,10 +1324,10 @@ if (scopeVisual) {
   });
 }
 
-/* ── Spread cloud tags: scrub stagger ── */
+/* ── Spread cloud tags: stagger fade-up ── */
 gsap.from('.spread-cloud span', {
-  scrollTrigger: { trigger: '.spread-cloud', start: 'top 82%', end: 'bottom 60%', scrub: 0.6 },
-  opacity: 0, y: 16, stagger: 0.04
+  scrollTrigger: { trigger: '.spread-cloud', start: 'top 82%', once: true },
+  opacity: 0, y: 12, stagger: 0.04, duration: 0.5, ease: 'power2.out'
 });
 
 /* ── CTA reveal ── */
