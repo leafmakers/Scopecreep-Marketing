@@ -1,131 +1,228 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scope Creep — The execution engine for creative work</title>
+<title>scope creep — the execution engine for creative work</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* Inline head script — --g-sb + --vh (CandidRender §1) */
+(function () {
+  var r = document.documentElement;
+  var sb = function () {
+    r.style.setProperty('--g-sb', (window.innerWidth - r.clientWidth) + 'px');
+  };
+  sb();
+  window.addEventListener('resize', sb);
+  r.style.setProperty('--vh', window.innerHeight + 'px');
+  window.addEventListener('orientationchange', function () {
+    r.style.setProperty('--vh', window.innerHeight + 'px');
+  });
+})();
+</script>
 <style>
 /* ═══════════════════════════════════════
-   SHARED TOKENS
+   CANDIDRENDER TOKENS — Structural Grid v1.0
    ═══════════════════════════════════════ */
 :root {
-  --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --mono: 'Geist Mono', 'SF Mono', monospace;
-  --r: 8px;
-  --r-s: 6px;
-  --r-xs: 4px;
-  --max: 1140px;
+  --font-plus-jakarta: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', monospace;
 
-  /* Bauhaus primaries (light mode) */
-  --c-red:    #CC2828;
-  --c-yellow: #C09018;
-  --c-blue:   #1A48C8;
+  /* Grid */
+  --g-cols: 12;
+  --g-gap: 24px;
+  --g-pad: 32px;
+  --g-max: 1200px;
+  --g-inset: var(--g-pad);
+  --g-line: rgba(40, 40, 40, 0.14);
+  --g-line-soft: transparent;
+  --g-divider: rgba(40, 40, 40, 0.14);
+  --g-row-min: 0;
+
+  /* Radius */
+  --r-md: 10px;
+  --r-xl: 18px;
+  --r-2xl: 24px;
+
+  /* Accent (reserved for assistive touch, small affordances) */
+  --c-yellow-300: #fde047;
+  --c-yellow-400: #facc15;
+  --c-emerald-500: #10b981;
+  --c-wordmark: #8b1a1a;
+  --c-wordmark-stroke: #a52222;
 }
 
-/* ═══════════════════════════════════════
-   DARK — warm near-black
-   ═══════════════════════════════════════ */
-[data-theme="dark"] {
-  --bg:      #0F0F0D;
-  --bg-1:    #141412;
-  --bg-2:    #1C1B18;
-  --bg-3:    #232220;
-  --border:  #2C2B27;
-  --border-h:#3C3B37;
-  --t1:      #EDEAE3;
-  --t2:      #8A8780;
-  --t3:      #56534D;
-  --t4:      #34322E;
-  --accent:  #EDEAE3;
-  --nav-bg:  rgba(15,15,13,0.88);
-
-  /* Bauhaus primaries — lighter, screen-optimized */
-  --c-red:    #D86060;
-  --c-yellow: #C8A840;
-  --c-blue:   #5888E8;
-}
+@media (max-width: 1024px) { :root { --g-cols: 8; } }
+@media (max-width: 768px)  { :root { --g-cols: 4; --g-pad: 24px; } }
+@media (max-width: 480px)  { :root { --g-cols: 2; --g-pad: 16px; --g-gap: 12px; } }
 
 /* ═══════════════════════════════════════
-   LIGHT — warm off-white
+   LIGHT — editorial off-white
    ═══════════════════════════════════════ */
 [data-theme="light"] {
-  --bg:      #F6F5F0;
-  --bg-1:    #EEECE7;
-  --bg-2:    #E6E4DE;
-  --bg-3:    #DAD8D1;
-  --border:  #C8C6BE;
-  --border-h:#A8A69E;
-  --t1:      #111110;
-  --t2:      #555450;
-  --t3:      #888580;
-  --t4:      #BBBAB5;
-  --accent:  #111110;
-  --nav-bg:  rgba(246,245,240,0.92);
+  --bg:        #ffffff;
+  --bg-1:      #f5f5f5;      /* neutral-100 tinted panels */
+  --bg-2:      #fafafa;
+  --bg-3:      #ececec;
+  --border:    rgba(0,0,0,0.08);
+  --border-h:  rgba(0,0,0,0.16);
+  --t1:        #0a0a0a;
+  --t2:        #525252;      /* gray-500 */
+  --t3:        #737373;      /* gray-400-ish */
+  --t4:        #a3a3a3;
+  --accent:    #0a0a0a;
+  --nav-bg:    rgba(255,255,255,0.82);
+  --g-line:    rgba(40,40,40,0.14);
+  --g-divider: rgba(40,40,40,0.14);
+}
+
+/* ═══════════════════════════════════════
+   DARK — near-black
+   ═══════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:        #15151a;
+  --bg-1:      #1d1d22;
+  --bg-2:      #22222a;
+  --bg-3:      #2a2a32;
+  --border:    rgba(255,255,255,0.08);
+  --border-h:  rgba(255,255,255,0.16);
+  --t1:        #f5f5f5;
+  --t2:        #a3a3a3;
+  --t3:        #8a8a8a;
+  --t4:        #525252;
+  --accent:    #f5f5f5;
+  --nav-bg:    rgba(21,21,26,0.82);
+  --g-line:    rgba(255,255,255,0.08);
+  --g-divider: rgba(255,255,255,0.08);
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+}
 body {
-  font-family: var(--sans); background: var(--bg); color: var(--t1);
-  -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.6; overflow-x: hidden;
+  font-family: var(--font-plus-jakarta);
+  background: var(--bg);
+  color: var(--t1);
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
   transition: background 0.3s, color 0.3s;
 }
 a { color: inherit; text-decoration: none; }
-[data-theme="dark"] ::selection  { background: #EDEAE3; color: #0F0F0D; }
-[data-theme="light"] ::selection { background: #111110; color: #F6F5F0; }
+::selection { background: #e5e5e5; color: #0a0a0a; }
+[data-theme="dark"] ::selection { background: #f5f5f5; color: #0a0a0a; }
 img { display: block; max-width: 100%; }
 
-/* grain removed */
-.grain { display: none; }
+.material-icons-outlined {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal; font-style: normal;
+  display: inline-flex; line-height: 1;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'liga';
+}
 
 /* ═══════════════════════════════════════
-   APPLE GLOW CARD
+   STRUCTURAL GRID — .g-row / .g-cell
    ═══════════════════════════════════════ */
-.glow-card, .ai-row {
+.g-row {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  align-items: stretch;
+  min-height: var(--g-row-min);
   position: relative;
-  transition: border-color 0.25s, box-shadow 0.35s cubic-bezier(0.34,1.3,0.64,1);
 }
-.glow-card::before, .ai-row::before {
-  content: ''; position: absolute; inset: 0; z-index: 0;
-  opacity: 0; transition: opacity 0.35s; pointer-events: none; border-radius: inherit;
+.g-row::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: calc(100vw - var(--g-sb, 0px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--g-divider);
+  pointer-events: none;
 }
-[data-theme="dark"]  .glow-card::before,
-[data-theme="dark"]  .ai-row::before { background: radial-gradient(520px circle at var(--cx,50%) var(--cy,50%), rgba(237,234,227,0.06), transparent 55%); }
-[data-theme="light"] .glow-card::before,
-[data-theme="light"] .ai-row::before { background: radial-gradient(520px circle at var(--cx,50%) var(--cy,50%), rgba(17,17,16,0.04), transparent 55%); }
-.glow-card:hover::before, .ai-row:hover::before { opacity: 1; }
-[data-theme="dark"]  .glow-card:hover { border-color: rgba(237,234,227,0.2); box-shadow: 0 0 0 1px rgba(237,234,227,0.05), 0 24px 64px rgba(0,0,0,0.55); }
-[data-theme="light"] .glow-card:hover { border-color: rgba(17,17,16,0.18); box-shadow: 0 0 0 1px rgba(17,17,16,0.03), 0 24px 64px rgba(0,0,0,0.08); }
-.glow-card > * { position: relative; z-index: 1; }
+.g-row--no-divider::after { content: none; }
+.g-cell {
+  grid-column: var(--g-col, auto);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.g-full    { --g-col: 1 / -1; }
+.g-half-l  { --g-col: 1 / span calc(var(--g-cols) / 2); }
+.g-half-r  { --g-col: span calc(var(--g-cols) / 2) / -1; }
+.g-third-l { --g-col: 1 / span calc(var(--g-cols) / 3); }
+.g-third-m { --g-col: span calc(var(--g-cols) / 3) / span calc(var(--g-cols) / 3); }
+.g-third-r { --g-col: span calc(var(--g-cols) / 3) / -1; }
+
+/* ═══════════════════════════════════════
+   CARD GRAIN — tinted surfaces only
+   ═══════════════════════════════════════ */
+.card-grain { position: relative; overflow: hidden; }
+.card-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+.card-grain > * { position: relative; z-index: 2; }
+[data-theme="dark"] .card-grain::before { opacity: 0.2; mix-blend-mode: screen; }
 
 /* ═══════════════════════════════════════
    NAV
    ═══════════════════════════════════════ */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px;
-  display: flex; align-items: center; justify-content: center; padding: 0 24px;
-  background: var(--nav-bg); backdrop-filter: saturate(180%) blur(20px);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 60px;
+  display: flex; align-items: center; justify-content: center; padding: 0 var(--g-pad);
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid transparent; transition: border-color 0.3s, background 0.3s;
 }
 .nav.scrolled { border-bottom-color: var(--border); }
-.nav-inner { width: 100%; max-width: var(--max); display: flex; align-items: center; justify-content: space-between; }
-.nav-left { display: flex; align-items: center; gap: 28px; }
-.logo { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; display: flex; align-items: center; }
-.nav-links { display: flex; gap: 22px; }
-.nav-links a { font-size: 13px; font-weight: 500; color: var(--t3); transition: color 0.15s; }
+.nav-inner { width: 100%; max-width: var(--g-max); display: flex; align-items: center; justify-content: space-between; }
+.nav-left { display: flex; align-items: center; gap: 32px; }
+.logo {
+  font-weight: 800; font-size: 15px; letter-spacing: -0.04em;
+  display: flex; align-items: center; color: var(--t1);
+  text-transform: lowercase;
+}
+.nav-links { display: flex; gap: 26px; }
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--t2); transition: color 0.15s;
+  text-transform: lowercase; letter-spacing: -0.01em;
+}
 .nav-links a:hover { color: var(--t1); }
 .nav-right { display: flex; align-items: center; gap: 12px; }
 
 /* Theme toggle */
 .theme-toggle {
-  width: 38px; height: 22px; border-radius: 100px;
-  background: var(--bg-3); border: 1px solid var(--border-h);
+  width: 40px; height: 22px; border-radius: 100px;
+  background: var(--bg-1); border: 1px solid var(--border-h);
   cursor: pointer; position: relative; transition: background 0.25s, border-color 0.25s;
   flex-shrink: 0; padding: 0;
 }
@@ -135,650 +232,934 @@ img { display: block; max-width: 100%; }
   background: var(--t1);
   transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
 }
-[data-theme="light"] .theme-toggle-thumb { transform: translateX(16px); }
+[data-theme="dark"] .theme-toggle-thumb { transform: translateX(18px); }
 
-/* Buttons */
-.btn {
-  font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 7px 16px;
-  border-radius: var(--r-xs); border: 1px solid var(--border-h);
-  background: transparent; color: var(--t2);
-  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+/* ═══════════════════════════════════════
+   3D PILL BUTTON (CandidRender §6a)
+   ═══════════════════════════════════════ */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 999px;
+  font-family: var(--font-plus-jakarta);
+  font-size: 12.5px; font-weight: 700; letter-spacing: -0.005em;
+  background: #ffffff; color: #1f2937;
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer; user-select: none;
+  transition: transform 150ms cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 150ms ease-out,
+              background 150ms ease-out;
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.10),
+    0 2px 4px rgba(0,0,0,0.06),
+    inset 0 -1px 2px rgba(0,0,0,0.05);
 }
-.btn:hover { border-color: var(--t2); color: var(--t1); }
+.pill:hover { transform: translateY(-1px) scale(1.02); }
+.pill:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.10),
+    inset 0 1px 2px rgba(0,0,0,0.05);
+}
+.pill.pill-dark {
+  background: linear-gradient(180deg, #3f3f46 0%, #18181b 100%);
+  color: #ffffff;
+  border-color: rgba(0,0,0,0.2);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.22),
+    0 2px 4px rgba(0,0,0,0.12),
+    inset 0 -1px 2px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.pill .material-icons-outlined { font-size: 14px; }
+[data-theme="dark"] .pill {
+  background: #ffffff;
+  color: #0a0a0a;
+}
 
-.btn-a {
-  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px;
-  border-radius: var(--r-xs); border: 1px solid var(--t1);
-  background: var(--t1); color: var(--bg);
-  cursor: pointer; transition: opacity 0.15s; display: inline-flex; align-items: center;
-}
-.btn-a:hover { opacity: 0.75; }
+/* Legacy class bridges (.btn / .btn-a now map to pill variants) */
+.btn { all: unset; }
+.btn, .btn-a { cursor: pointer; }
+.btn { }
 
 /* ═══════════════════════════════════════
    HERO
    ═══════════════════════════════════════ */
-.hero { padding: 152px 24px 64px; text-align: center; position: relative; }
-.hero > * { position: relative; z-index: 1; }
+.hero {
+  padding: 148px 0 96px;
+  position: relative;
+}
+.hero-inner {
+  max-width: var(--g-max);
+  margin: 0 auto;
+  padding: 0 var(--g-pad);
+  text-align: center;
+}
 .hero-pill {
-  display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500;
-  color: var(--t3); background: var(--bg-1);
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--t2); background: var(--bg-1);
   border: 1px solid var(--border);
-  border-radius: 100px; padding: 5px 14px 5px 10px; margin-bottom: 28px;
+  border-radius: 100px; padding: 6px 14px 6px 10px; margin-bottom: 32px;
+  text-transform: uppercase;
 }
-.hero-pill-dot { width: 5px; height: 5px; background: var(--c-red); border-radius: 50%; }
+.hero-pill-dot {
+  width: 6px; height: 6px; background: var(--c-yellow-300);
+  border: 1px solid var(--c-yellow-400); border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(253,224,71,0.15);
+}
 .hero h1 {
-  font-size: clamp(40px, 6.2vw, 74px); font-weight: 700; letter-spacing: -2px;
-  line-height: 1.04; max-width: 800px; margin: 0 auto 24px;
+  font-size: clamp(44px, 7vw, 84px);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 0.98;
+  max-width: 900px; margin: 0 auto 28px;
+  text-transform: lowercase;
 }
-.gr {
-  background: none; -webkit-background-clip: unset; -webkit-text-fill-color: inherit; background-clip: unset;
+.hero h1 em {
+  font-style: normal; font-weight: 300;
+  color: var(--t2);
 }
 .hero-sub {
-  font-size: 17px; font-weight: 400; color: var(--t2); max-width: 540px;
-  margin: 0 auto 36px; line-height: 1.65;
+  font-size: 17px; font-weight: 400; color: var(--t2);
+  max-width: 560px; margin: 0 auto 40px; line-height: 1.55;
+  letter-spacing: -0.005em;
 }
-.hero-cta { display: flex; align-items: center; justify-content: center; gap: 12px; }
-.hero-cta .btn-a { padding: 10px 24px; font-size: 14px; }
-.hero-cta .btn { padding: 10px 20px; font-size: 14px; }
-.hero-meta { font-size: 12px; color: var(--t4); margin-top: 12px; }
+.hero-cta { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.hero-cta .pill { padding: 11px 22px; font-size: 13px; }
+.hero-meta {
+  font-size: 11px; color: var(--t3);
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
 
 /* ═══════════════════════════════════════
    EMOTIONAL REFRAME
    ═══════════════════════════════════════ */
-.reframe { padding: 100px 24px 80px; text-align: center; }
-.reframe h2 {
-  font-size: clamp(18px, 2.4vw, 26px); font-weight: 500; color: var(--t2); letter-spacing: -0.3px;
-  line-height: 1.5; max-width: 680px; margin: 0 auto;
+.reframe {
+  padding: 80px var(--g-pad);
+  text-align: center;
+  background: var(--bg-1);
+  border-top: 1px solid var(--g-divider);
+  border-bottom: 1px solid var(--g-divider);
 }
-.reframe h2 strong { color: var(--t1); font-weight: 700; }
+.reframe h2 {
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 400; color: var(--t2);
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  max-width: 720px; margin: 0 auto;
+  text-transform: lowercase;
+}
+.reframe h2 strong {
+  color: var(--t1); font-weight: 700;
+  display: block; margin-top: 10px;
+}
+
+/* ═══════════════════════════════════════
+   SECTION FRAME
+   ═══════════════════════════════════════ */
+.sec {
+  max-width: var(--g-max);
+  margin: 0 auto;
+  padding: 128px var(--g-pad);
+}
+.sec-tag {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 18px;
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--t2);
+  font-family: var(--font-mono);
+}
+.sec-tag::before {
+  content: ''; width: 18px; height: 1px; background: currentColor; opacity: 0.5;
+}
+.sec-h {
+  font-size: clamp(32px, 4.4vw, 52px); font-weight: 800;
+  letter-spacing: -0.035em; line-height: 1.02;
+  margin-bottom: 20px;
+  text-transform: lowercase;
+  max-width: 760px;
+}
+.sec-p {
+  font-size: 16px; color: var(--t2);
+  max-width: 560px; line-height: 1.55;
+  letter-spacing: -0.005em;
+}
 
 /* ═══════════════════════════════════════
    4 PILLARS
    ═══════════════════════════════════════ */
-.pillars { padding: 80px 24px 100px; }
+.pillars {
+  padding: 96px var(--g-pad) 96px;
+  max-width: var(--g-max);
+  margin: 0 auto;
+}
 .pillars-grid {
-  max-width: var(--max); margin: 0 auto;
   display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 .pillar {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 44px 40px 40px;
-  text-align: left; position: relative; min-height: 220px;
-  transition: box-shadow 0.25s, transform 0.25s;
+  background: var(--bg-1);
+  border-radius: var(--r-2xl);
+  padding: 40px 36px 36px;
+  text-align: left; position: relative;
+  min-height: 240px;
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
+  border: 1px solid var(--border);
 }
-/* Left Bauhaus color stripe */
-.pillar::after {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-}
-.pillar:nth-child(1)::after { background: var(--c-blue); }
-.pillar:nth-child(2)::after { background: var(--c-red); }
-.pillar:nth-child(3)::after { background: var(--c-yellow); }
-.pillar:nth-child(4)::after { background: var(--c-red); }
-
+.pillar::after { display: none; }
 .pillar-num {
-  font-family: var(--mono); font-size: 10px; color: var(--t4);
-  letter-spacing: 0.5px; display: block; margin-bottom: 40px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--t4);
+  letter-spacing: 0.08em;
+  display: block; margin-bottom: 48px;
 }
 .pillar-icon {
   position: absolute; top: 40px; right: 36px;
-  width: 26px; height: 26px; opacity: 0.45;
-  display: flex; align-items: flex-start; justify-content: center;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--t2);
+  border: 1px solid var(--border);
 }
-.pillar h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.4px; line-height: 1.2; }
-.pillar p { font-size: 13px; color: var(--t2); line-height: 1.65; max-width: 320px; }
-
-/* UC card icon Bauhaus colors — icons only */
-.uc-card:nth-child(1) .uc-icon-sym { color: var(--c-red); }
-.uc-card:nth-child(2) .uc-icon-sym { color: var(--c-blue); }
-.uc-card:nth-child(3) .uc-icon-sym { color: var(--c-yellow); }
-.uc-card:nth-child(4) .uc-icon-sym { color: var(--c-blue); }
+.pillar-icon .material-icons-outlined { font-size: 18px; }
+.pillar h3 {
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 10px; letter-spacing: -0.03em;
+  line-height: 1.15; text-transform: lowercase;
+}
+.pillar p {
+  font-size: 14px; color: var(--t2); line-height: 1.55;
+  max-width: 340px;
+}
+@media (min-width: 768px) {
+  .pillar:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.10);
+  }
+  [data-theme="dark"] .pillar:hover {
+    box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5);
+  }
+}
 
 /* ═══════════════════════════════════════
-   DIVIDER / SECTION UTILITIES
+   STW MOCKUP
    ═══════════════════════════════════════ */
-.div { max-width: var(--max); margin: 0 auto; height: 1px; background: var(--border); }
-.sec { max-width: var(--max); margin: 0 auto; padding: 120px 24px; }
-.sec-tag {
-  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.2px;
-  margin-bottom: 14px; display: inline-block;
-}
-
-/* Section tags — neutral, no primary colors */
-.sec-tag-blue, .sec-tag-yellow, .sec-tag-red { color: var(--t3); }
-
-.sec-h { font-size: clamp(28px, 3.5vw, 40px); font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 14px; }
-.sec-p { font-size: 16px; color: var(--t2); max-width: 520px; line-height: 1.6; }
-
-/* ═══════════════════════════════════════
-   SLIDE-TO-WORK
-   ═══════════════════════════════════════ */
-.stw-visual {
-  margin-top: 56px; background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
+.stw-visual, .aj-visual, .scope-visual {
+  margin-top: 56px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
   overflow: hidden;
+  box-shadow: 0 32px 64px -36px rgba(0,0,0,0.14),
+              0 6px 16px -14px rgba(0,0,0,0.05);
 }
 .stw-bar {
-  display: flex; align-items: center; height: 40px; padding: 0 16px;
-  background: var(--bg-2); border-bottom: 1px solid var(--border); gap: 8px;
+  display: flex; align-items: center; height: 44px; padding: 0 16px;
+  background: var(--bg-1); border-bottom: 1px solid var(--border); gap: 8px;
 }
-.stw-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border-h); }
+.stw-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-h); }
 .stw-dot.r { background: #FF5F57; }
 .stw-dot.y { background: #FEBC2E; }
 .stw-dot.g { background: #28C840; }
 .stw-bar-title {
-  margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--t3);
+  margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--t3);
   background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 3px 10px;
 }
-.stw-body { display: grid; grid-template-columns: 340px 1fr; min-height: 440px; }
+.stw-body { display: grid; grid-template-columns: 340px 1fr; min-height: 460px; }
 
 /* Album side */
 .stw-album { border-right: 1px solid var(--border); padding: 24px; background: var(--bg); }
 .stw-album-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--t3); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--t3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
 }
-.stw-album-label::before { content:''; width: 5px; height: 5px; background: var(--t3); border-radius: 50%; }
+.stw-album-label::before { content:''; width: 6px; height: 6px; background: var(--t3); border-radius: 50%; }
 
-/* Progress bar in album header */
 .stw-album-header { margin-bottom: 18px; }
-.stw-album-project { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-.stw-album-progress { display: flex; align-items: center; gap: 8px; }
+.stw-album-progress { display: flex; align-items: center; gap: 10px; }
 .stw-prog-track { flex: 1; height: 3px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
-.stw-prog-fill { height: 100%; border-radius: 2px; background: var(--t2); }
-.stw-prog-label { font-family: var(--mono); font-size: 9px; color: var(--t4); white-space: nowrap; }
+.stw-prog-fill { height: 100%; border-radius: 2px; background: var(--t1); }
+.stw-prog-label { font-family: var(--font-mono); font-size: 9px; color: var(--t4); white-space: nowrap; letter-spacing: 0.04em; }
 
-/* Mini progress bar replacing the dot in slide meta */
 .stw-mini-track { width: 44px; height: 3px; background: var(--bg-3); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
 .stw-mini-fill { height: 100%; border-radius: 2px; }
-.stw-mini-fill.done   { background: #28C840; }
-.stw-mini-fill.active { background: #FEBC2E; }
+.stw-mini-fill.done   { background: var(--c-emerald-500); }
+.stw-mini-fill.active { background: var(--c-yellow-400); }
 .stw-mini-fill.empty  { background: var(--border-h); width: 0; }
-.stw-mini-fill.blocked { background: #FF5F57; width: 30%; }
+.stw-mini-fill.blocked { background: #ef4444; width: 30%; }
 
 .stw-slide {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
-  padding: 14px; margin-bottom: 10px; cursor: default; transition: border-color 0.15s;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: default;
+  transition: border-color 0.15s;
 }
 .stw-slide:hover { border-color: var(--border-h); }
-.stw-slide.active { border-color: var(--t1); }
-.stw-slide-num { font-family: var(--mono); font-size: 10px; color: var(--t4); margin-bottom: 6px; }
-.stw-slide-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-.stw-slide-meta { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 8px; }
+.stw-slide.active {
+  border-color: var(--t1);
+  background: var(--bg-2);
+}
+.stw-slide-num { font-family: var(--font-mono); font-size: 10px; color: var(--t4); margin-bottom: 6px; letter-spacing: 0.04em; }
+.stw-slide-title { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.015em; }
+.stw-slide-meta { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); }
 
 /* Scope side */
-.stw-scope { padding: 24px; }
+.stw-scope { padding: 24px; background: var(--bg); }
 .stw-scope-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--t3); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--t3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
 }
-.stw-scope-label::before { content:''; width: 5px; height: 5px; background: var(--t3); border-radius: 50%; }
-.stw-scope-header { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
-.stw-scope-sub { font-size: 12px; color: var(--t3); margin-bottom: 20px; }
+.stw-scope-label::before { content:''; width: 6px; height: 6px; background: var(--t3); border-radius: 50%; }
+.stw-scope-header {
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 4px; letter-spacing: -0.03em;
+  text-transform: lowercase;
+}
+.stw-scope-sub { font-size: 12px; color: var(--t3); margin-bottom: 22px; font-family: var(--font-mono); letter-spacing: 0.01em; }
 .stw-task {
-  display: flex; align-items: flex-start; gap: 10px; padding: 10px 0 10px 12px;
-  border-bottom: 1px solid var(--border); position: relative;
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
 }
 .stw-task:last-child { border-bottom: none; }
-/* Task category left bar */
-.stw-task::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; border-radius: 1px; background: var(--border); }
-.stw-task.cat-copy::before   { background: var(--c-blue); }
-.stw-task.cat-design::before { background: var(--c-yellow); }
-.stw-task.cat-ai::before     { background: var(--c-yellow); }
-.stw-task.cat-review::before { background: var(--t3); }
-.stw-task.cat-dev::before    { background: var(--t4); }
-.stw-task.cat-blocked::before { background: var(--c-red); }
 .stw-check {
-  width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border-h);
-  flex-shrink: 0; margin-top: 2px; transition: all 0.15s;
+  width: 17px; height: 17px; border-radius: 5px;
+  border: 1.5px solid var(--border-h);
+  flex-shrink: 0; margin-top: 1px;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
 }
-.stw-check.done { background: var(--t1); border-color: var(--t1); }
+.stw-check.done {
+  background: var(--t1); border-color: var(--t1); color: var(--bg);
+}
+.stw-check.done::after {
+  content: 'check'; font-family: 'Material Icons Outlined'; font-size: 12px;
+}
 .stw-task-body { flex: 1; }
-.stw-task-title { font-size: 13px; font-weight: 500; }
+.stw-task-title { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; }
 .stw-task-title.done { color: var(--t3); text-decoration: line-through; }
-.stw-task-tags { display: flex; gap: 6px; margin-top: 4px; }
+.stw-task-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .stw-tag {
-  font-family: var(--mono); font-size: 9px; font-weight: 500; padding: 2px 7px;
-  border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid transparent;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+  border: 1px solid transparent;
 }
-
-/* Bauhaus-colored STW chips */
-.tag-ws {
-  color: var(--c-blue);
-  background: rgba(26,72,200,0.08);
-  border-color: rgba(26,72,200,0.22);
-}
-[data-theme="dark"] .tag-ws {
-  background: rgba(88,136,232,0.10);
-  border-color: rgba(88,136,232,0.22);
-}
+.tag-ws { color: var(--t2); background: var(--bg-1); border-color: var(--border); }
 .tag-ai {
-  color: var(--c-yellow);
-  background: rgba(192,144,24,0.08);
-  border-color: rgba(192,144,24,0.22);
+  color: #78350f; background: #fef3c7; border-color: #fde68a;
 }
-[data-theme="dark"] .tag-ai {
-  background: rgba(200,168,64,0.10);
-  border-color: rgba(200,168,64,0.22);
-}
-.tag-pr {
-  color: var(--c-yellow);
-  background: rgba(192,144,24,0.08);
-  border-color: rgba(192,144,24,0.22);
-}
-[data-theme="dark"] .tag-pr {
-  background: rgba(200,168,64,0.10);
-  border-color: rgba(200,168,64,0.22);
-}
-.tag-bl {
-  color: var(--c-red);
-  background: rgba(204,40,40,0.08);
-  border-color: rgba(204,40,40,0.22);
-}
-[data-theme="dark"] .tag-bl {
-  background: rgba(216,96,96,0.10);
-  border-color: rgba(216,96,96,0.22);
-}
-.tag-rv {
-  color: var(--t3);
-  background: var(--bg-3);
-  border-color: var(--border);
-}
+[data-theme="dark"] .tag-ai { color: #fde047; background: rgba(253,224,71,0.1); border-color: rgba(253,224,71,0.3); }
+.tag-pr { color: #78350f; background: #fef3c7; border-color: #fde68a; }
+[data-theme="dark"] .tag-pr { color: #fde047; background: rgba(253,224,71,0.1); border-color: rgba(253,224,71,0.3); }
+.tag-bl { color: #7f1d1d; background: #fee2e2; border-color: #fecaca; }
+[data-theme="dark"] .tag-bl { color: #fca5a5; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+.tag-rv { color: var(--t3); background: var(--bg-3); border-color: var(--border); }
 
 /* ═══════════════════════════════════════
-   AI DELEGATION
+   AI DELEGATION LIST
    ═══════════════════════════════════════ */
-.ai-section { position: relative; }
 .ai-list { margin-top: 56px; }
 .ai-row {
-  display: grid; grid-template-columns: 28px 44px 1fr;
-  gap: 0 28px; padding: 28px 0;
-  border-top: 1px solid var(--border); align-items: start;
-  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: 32px 48px 1fr;
+  gap: 0 28px; padding: 32px 0;
+  border-top: 1px solid var(--border);
+  align-items: start;
+  position: relative;
   transition: background 0.2s;
 }
 .ai-row:last-child { border-bottom: 1px solid var(--border); }
-.ai-row-num { font-family: var(--mono); font-size: 10px; color: var(--t4); padding-top: 3px; }
-.ai-icon {
-  width: 40px; height: 40px;
-  display: flex; align-items: flex-start; justify-content: center;
-  padding-top: 2px;
+.ai-row-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--t4);
+  padding-top: 6px; letter-spacing: 0.04em;
 }
-/* AI row icon primary colors */
-.ai-row:nth-child(1) .ai-icon { color: var(--c-blue); }
-.ai-row:nth-child(2) .ai-icon { color: var(--c-red); }
-.ai-row:nth-child(3) .ai-icon { color: var(--c-yellow); }
-.ai-row:nth-child(4) .ai-icon { color: var(--c-red); }
-.ai-row h3 { font-size: 17px; font-weight: 700; margin-bottom: 7px; letter-spacing: -0.4px; }
-.ai-row p { font-size: 14px; color: var(--t2); line-height: 1.65; max-width: 580px; }
+.ai-icon {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--t1);
+}
+.ai-icon .material-icons-outlined { font-size: 20px; }
+.ai-row h3 {
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 8px; letter-spacing: -0.03em;
+  text-transform: lowercase;
+}
+.ai-row p {
+  font-size: 14.5px; color: var(--t2);
+  line-height: 1.6;
+  max-width: 620px;
+  letter-spacing: -0.005em;
+}
 
 /* ═══════════════════════════════════════
    AGENT JOBS MOCKUP
    ═══════════════════════════════════════ */
-.aj-visual {
-  margin-top: 56px; background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
-  overflow: hidden;
-}
-.aj-body { display: grid; grid-template-columns: 280px 1fr; min-height: 400px; }
-
-/* Sidebar */
-.aj-sidebar {
-  border-right: 1px solid var(--border); padding: 20px; background: var(--bg);
-}
+.aj-body { display: grid; grid-template-columns: 280px 1fr; min-height: 420px; }
+.aj-sidebar { border-right: 1px solid var(--border); padding: 22px; background: var(--bg); }
 .aj-sidebar-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--t3); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--t3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
 }
-.aj-sidebar-label::before { content:''; width: 5px; height: 5px; background: var(--t3); border-radius: 50%; }
+.aj-sidebar-label::before { content:''; width: 6px; height: 6px; background: var(--t3); border-radius: 50%; }
 .aj-job {
-  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-s);
-  padding: 12px 14px; margin-bottom: 8px; cursor: default; transition: border-color 0.15s;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  margin-bottom: 8px;
+  cursor: default;
+  transition: border-color 0.15s, transform 0.15s;
 }
 .aj-job:hover { border-color: var(--border-h); }
 .aj-job.active { border-color: var(--t1); background: var(--bg-2); }
-.aj-job-num { font-family: var(--mono); font-size: 9px; color: var(--t4); margin-bottom: 5px; }
+.aj-job-num { font-family: var(--font-mono); font-size: 9px; color: var(--t4); margin-bottom: 6px; letter-spacing: 0.06em; }
 .aj-job.active .aj-job-num { color: var(--t2); }
-.aj-job-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.aj-job-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.015em; }
 .aj-chip {
-  font-family: var(--mono); font-size: 9px; font-weight: 500; padding: 2px 7px;
-  border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid transparent;
-  display: inline-block;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  padding: 2px 7px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  border: 1px solid transparent; display: inline-block;
 }
-.aj-chip-blue {
-  color: var(--c-blue); background: rgba(26,72,200,0.08); border-color: rgba(26,72,200,0.22);
-}
-[data-theme="dark"] .aj-chip-blue {
-  background: rgba(88,136,232,0.10); border-color: rgba(88,136,232,0.22);
-}
-.aj-chip-yellow {
-  color: var(--c-yellow); background: rgba(192,144,24,0.08); border-color: rgba(192,144,24,0.22);
-}
-[data-theme="dark"] .aj-chip-yellow {
-  background: rgba(200,168,64,0.10); border-color: rgba(200,168,64,0.22);
-}
-.aj-chip-neutral {
-  color: var(--t3); background: var(--bg-3); border-color: var(--border);
-}
+.aj-chip-blue { color: var(--t2); background: var(--bg-3); border-color: var(--border); }
+.aj-chip-yellow { color: #78350f; background: #fef3c7; border-color: #fde68a; }
+[data-theme="dark"] .aj-chip-yellow { color: #fde047; background: rgba(253,224,71,0.1); border-color: rgba(253,224,71,0.3); }
+.aj-chip-neutral { color: var(--t3); background: var(--bg-3); border-color: var(--border); }
 
-/* Detail panel */
-.aj-detail { padding: 24px; }
-.aj-detail-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
-.aj-detail-sub { font-size: 12px; color: var(--t3); margin-bottom: 22px; }
+.aj-detail { padding: 26px; background: var(--bg); }
+.aj-detail-title {
+  font-size: 20px; font-weight: 700;
+  letter-spacing: -0.03em; margin-bottom: 5px;
+  text-transform: lowercase;
+}
+.aj-detail-sub { font-size: 12px; color: var(--t3); margin-bottom: 24px; font-family: var(--font-mono); letter-spacing: 0.01em; }
 .aj-section-label {
-  font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px;
-  color: var(--t4); margin-bottom: 7px; margin-top: 16px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--t4);
+  margin-bottom: 8px; margin-top: 18px;
+  font-family: var(--font-mono);
 }
 .aj-section-label:first-of-type { margin-top: 0; }
 .aj-role-text {
-  font-size: 12px; color: var(--t2); line-height: 1.6;
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
-  padding: 10px 12px; font-family: var(--mono);
+  font-size: 12.5px; color: var(--t2); line-height: 1.55;
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-family: var(--font-mono);
 }
 .aj-context-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .aj-ctx-pill {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 6px;
   font-size: 11px; font-weight: 500; color: var(--t2);
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: 5px;
-  padding: 4px 9px; cursor: default;
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 5px 10px; cursor: default;
+  letter-spacing: -0.005em;
 }
-.aj-ctx-pill svg { color: var(--t3); flex-shrink: 0; }
+.aj-ctx-pill .material-icons-outlined { font-size: 12px; color: var(--t3); }
 .aj-output-area {
   margin-top: 4px;
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
-  padding: 12px; min-height: 80px;
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 14px; min-height: 90px;
 }
-.aj-output-line { font-size: 12px; color: var(--t2); line-height: 1.7; font-family: var(--mono); }
+.aj-output-line { font-size: 12px; color: var(--t2); line-height: 1.75; font-family: var(--font-mono); }
 .aj-output-line.dim { opacity: 0.5; }
 .aj-cursor {
   display: inline-block; width: 6px; height: 12px;
-  background: var(--c-yellow); border-radius: 1px;
+  background: var(--c-yellow-400); border-radius: 1px;
   margin-left: 2px; vertical-align: middle;
   animation: blink-cur 1.1s step-start infinite;
 }
 @keyframes blink-cur { 0%,100%{opacity:1} 50%{opacity:0} }
 .aj-detail-footer {
-  margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
+  margin-top: 22px; padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
 .aj-status-badge {
-  font-size: 11px; font-weight: 600; color: var(--c-yellow); margin-right: auto;
-  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700;
+  color: #78350f;
+  background: #fef3c7;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid #fde68a;
+  margin-right: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  font-family: var(--font-mono);
 }
+[data-theme="dark"] .aj-status-badge { color: #fde047; background: rgba(253,224,71,0.1); border-color: rgba(253,224,71,0.3); }
+.aj-status-badge svg circle { fill: currentColor; }
 
 /* ═══════════════════════════════════════
    USE CASES
    ═══════════════════════════════════════ */
-.uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
+.uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 56px; }
 .uc-card {
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 32px 28px 28px; position: relative; overflow: hidden;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  padding: 32px 28px 28px;
+  position: relative; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
 }
-/* Ghost background number */
 .uc-card::before {
   content: attr(data-num);
-  position: absolute; right: 8px; bottom: -18px;
-  font-size: 108px; font-weight: 800; line-height: 1;
-  color: var(--t1); opacity: 0.035;
-  font-family: var(--sans); user-select: none; pointer-events: none;
-  letter-spacing: -4px;
+  position: absolute; right: 12px; bottom: -22px;
+  font-size: 120px; font-weight: 800; line-height: 1;
+  color: var(--t1); opacity: 0.04;
+  font-family: var(--font-plus-jakarta); user-select: none; pointer-events: none;
+  letter-spacing: -0.06em;
 }
-
-/* Use case icons */
+@media (min-width: 768px) {
+  .uc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.10);
+  }
+}
 .uc-icon-sym {
-  width: 36px; height: 36px; margin-bottom: 16px;
+  width: 40px; height: 40px; margin-bottom: 18px;
   display: flex; align-items: center; justify-content: center;
-  color: var(--t2);
+  color: var(--t1); background: var(--bg); border-radius: 50%;
+  border: 1px solid var(--border);
 }
-.uc-amber  { color: var(--t2); }
-.uc-sap    { color: var(--t2); }
-.uc-mint   { color: var(--t2); }
-.uc-violet { color: var(--t2); }
-
-.uc-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-.uc-card p  { font-size: 13px; color: var(--t2); line-height: 1.6; }
-.uc-card .uc-flow { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
-
-/* Base chip */
+.uc-icon-sym .material-icons-outlined { font-size: 20px; }
+.uc-card h3 {
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 10px; letter-spacing: -0.025em;
+  text-transform: lowercase;
+}
+.uc-card p { font-size: 13.5px; color: var(--t2); line-height: 1.55; letter-spacing: -0.005em; }
+.uc-card .uc-flow { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
 .uc-flow-tag {
-  font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 3px 9px;
-  border-radius: 4px; letter-spacing: 0.3px; border: 1px solid transparent;
-}
-
-/* Bauhaus-tinted use case chips */
-.uc-flow-tag.c-amber {
-  color: var(--c-yellow); background: rgba(192,144,24,0.08); border-color: rgba(192,144,24,0.22);
-}
-[data-theme="dark"] .uc-flow-tag.c-amber {
-  background: rgba(200,168,64,0.10); border-color: rgba(200,168,64,0.22);
-}
-.uc-flow-tag.c-sap {
-  color: var(--c-blue); background: rgba(26,72,200,0.08); border-color: rgba(26,72,200,0.22);
-}
-[data-theme="dark"] .uc-flow-tag.c-sap {
-  background: rgba(88,136,232,0.10); border-color: rgba(88,136,232,0.22);
-}
-.uc-flow-tag.c-mint {
-  color: var(--c-red); background: rgba(204,40,40,0.08); border-color: rgba(204,40,40,0.22);
-}
-[data-theme="dark"] .uc-flow-tag.c-mint {
-  background: rgba(216,96,96,0.10); border-color: rgba(216,96,96,0.22);
-}
-.uc-flow-tag.c-violet {
-  color: var(--t3); background: var(--bg-3); border-color: var(--border);
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  padding: 3px 10px; border-radius: 4px;
+  letter-spacing: 0.04em;
+  color: var(--t2); background: var(--bg); border: 1px solid var(--border);
+  text-transform: lowercase;
 }
 
 /* ═══════════════════════════════════════
    ECOSYSTEM
    ═══════════════════════════════════════ */
-.eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
+.eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
 .eco-card {
-  border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
-  background: var(--bg-2); position: relative; overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  padding: 32px;
+  background: var(--bg-1);
+  position: relative; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
 }
-.eco-card::before { display: none; }
-.eco-card::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+@media (min-width: 768px) {
+  .eco-card:hover { transform: translateY(-4px); }
 }
-.eco-card.c-blue::after   { background: var(--c-blue); }
-.eco-card.c-orange::after { background: var(--c-red); }
-.eco-card.c-purple::after { background: var(--c-yellow); }
 .eco-label {
-  font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.2px;
-  margin-bottom: 12px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  margin-bottom: 14px;
+  color: var(--t3); font-family: var(--font-mono);
+  display: inline-flex; align-items: center; gap: 8px;
 }
-.eco-card.c-blue   .eco-label,
-.eco-card.c-orange .eco-label,
-.eco-card.c-purple .eco-label { color: var(--t3); }
-.eco-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; line-height: 1.3; }
-.eco-card p  { font-size: 13px; color: var(--t2); line-height: 1.6; }
+.eco-label::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--c-yellow-400); border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(253,224,71,0.2);
+}
+.eco-card.c-blue .eco-label::before { background: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+.eco-card.c-purple .eco-label::before { background: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.2); }
+.eco-card h3 {
+  font-size: 20px; font-weight: 700;
+  letter-spacing: -0.03em; margin-bottom: 12px;
+  line-height: 1.2; text-transform: lowercase;
+}
+.eco-card p { font-size: 14px; color: var(--t2); line-height: 1.55; letter-spacing: -0.005em; }
 
 /* ═══════════════════════════════════════
-   SCOPE DETECTION SECTION
+   SCOPE DETECTION
    ═══════════════════════════════════════ */
-.scope-visual {
-  margin-top: 56px; background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
-  overflow: hidden;
-}
 .scope-warn-list { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
 .scope-warn {
-  border: 1px solid var(--border); border-radius: var(--r-s);
-  padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 14px;
   background: var(--bg-1); position: relative; overflow: hidden;
 }
 .scope-warn-stripe {
-  width: 3px; min-height: 100%; border-radius: 2px; flex-shrink: 0; align-self: stretch;
+  width: 3px; min-height: 100%; border-radius: 2px;
+  flex-shrink: 0; align-self: stretch;
 }
-.scope-warn-stripe.red    { background: var(--c-red); }
-.scope-warn-stripe.yellow { background: var(--c-yellow); }
-.scope-warn-stripe.blue   { background: var(--c-blue); }
+.scope-warn-stripe.red    { background: #ef4444; }
+.scope-warn-stripe.yellow { background: var(--c-yellow-400); }
+.scope-warn-stripe.blue   { background: #3b82f6; }
 .scope-warn-sev {
-  font-family: var(--mono); font-size: 8px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.8px;
-  padding: 2px 6px; border-radius: 3px;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 8px; border-radius: 4px;
   flex-shrink: 0; align-self: flex-start; margin-top: 1px;
+  border: 1px solid;
 }
-.scope-warn-sev.high   { color: var(--c-red);    background: rgba(204,40,40,0.1); }
-.scope-warn-sev.medium { color: var(--c-yellow);  background: rgba(192,144,24,0.1); }
-.scope-warn-sev.info   { color: var(--c-blue);    background: rgba(26,72,200,0.1); }
-[data-theme="dark"] .scope-warn-sev.high   { background: rgba(216,96,96,0.12); }
-[data-theme="dark"] .scope-warn-sev.medium { background: rgba(200,168,64,0.12); }
-[data-theme="dark"] .scope-warn-sev.info   { background: rgba(88,136,232,0.12); }
+.scope-warn-sev.high   { color: #b91c1c; background: #fee2e2; border-color: #fecaca; }
+.scope-warn-sev.medium { color: #78350f; background: #fef3c7; border-color: #fde68a; }
+.scope-warn-sev.info   { color: #1e40af; background: #dbeafe; border-color: #bfdbfe; }
+[data-theme="dark"] .scope-warn-sev.high   { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); }
+[data-theme="dark"] .scope-warn-sev.medium { color: #fde047; background: rgba(253,224,71,0.12); border-color: rgba(253,224,71,0.3); }
+[data-theme="dark"] .scope-warn-sev.info   { color: #93c5fd; background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); }
 .scope-warn-content { flex: 1; }
-.scope-warn-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-.scope-warn-desc  { font-size: 12px; color: var(--t2); line-height: 1.5; }
-.scope-warn-meta { font-size: 11px; color: var(--t4); margin-top: 4px; font-family: var(--mono); }
+.scope-warn-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.015em; }
+.scope-warn-desc  { font-size: 13px; color: var(--t2); line-height: 1.5; letter-spacing: -0.005em; }
+.scope-warn-meta { font-size: 11px; color: var(--t4); margin-top: 6px; font-family: var(--font-mono); letter-spacing: 0.01em; }
 .scope-warn-action {
-  font-family: var(--sans); font-size: 11px; font-weight: 500; padding: 4px 10px;
-  border-radius: var(--r-xs); border: 1px solid var(--border-h);
-  background: transparent; color: var(--t2); cursor: pointer;
-  transition: border-color 0.15s, color 0.15s; white-space: nowrap; align-self: center;
-  flex-shrink: 0;
+  font-family: var(--font-plus-jakarta); font-size: 11px; font-weight: 600;
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--border-h);
+  background: var(--bg); color: var(--t2); cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+  white-space: nowrap; align-self: center; flex-shrink: 0;
 }
-.scope-warn-action:hover { border-color: var(--t2); color: var(--t1); }
+.scope-warn-action:hover {
+  border-color: var(--t2); color: var(--t1); transform: translateY(-1px);
+}
 
 /* ═══════════════════════════════════════
-   FEATURE SPREAD
+   SPREAD CLOUD (marquee-inspired)
    ═══════════════════════════════════════ */
-.spread { padding: 80px 24px 120px; text-align: center; max-width: var(--max); margin: 0 auto; }
-.spread-title { font-size: 20px; font-weight: 600; color: var(--t2); margin-bottom: 24px; }
-.spread-title strong { color: var(--t1); }
-.spread-cloud { font-size: 15px; color: var(--t3); line-height: 2.2; max-width: 800px; margin: 0 auto; }
-.spread-cloud span {
-  display: inline-block; padding: 4px 14px; margin: 3px;
-  background: var(--bg-2); border: 1px solid var(--border); border-radius: 100px;
-  font-size: 13px; font-weight: 500; transition: border-color 0.15s, color 0.15s;
-  cursor: default;
+.spread {
+  padding: 96px var(--g-pad) 128px;
+  text-align: center; max-width: var(--g-max); margin: 0 auto;
 }
-.spread-cloud span:hover { border-color: var(--border-h); color: var(--t1); }
+.spread-title {
+  font-size: clamp(22px, 2.8vw, 28px);
+  font-weight: 500; color: var(--t2);
+  margin-bottom: 32px; letter-spacing: -0.02em;
+  text-transform: lowercase;
+}
+.spread-title strong {
+  color: var(--t1); font-weight: 800;
+  display: block; margin-top: 4px;
+}
+.spread-cloud {
+  font-size: 15px; color: var(--t3);
+  line-height: 2.4;
+  max-width: 820px; margin: 0 auto;
+}
+.spread-cloud span {
+  display: inline-block; padding: 5px 14px; margin: 4px 3px;
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px; font-weight: 500;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  cursor: default; letter-spacing: -0.005em;
+  text-transform: lowercase;
+}
+.spread-cloud span:hover {
+  border-color: var(--border-h); color: var(--t1);
+  transform: translateY(-1px);
+}
 
 /* ═══════════════════════════════════════
    CTA
    ═══════════════════════════════════════ */
-.cta { padding: 120px 24px 160px; text-align: center; }
-.cta > * { position: relative; }
-.cta h2 {
-  font-size: clamp(32px, 4.5vw, 52px); font-weight: 700; letter-spacing: -1.2px;
-  line-height: 1.1; max-width: 640px; margin: 0 auto 16px;
+.cta {
+  padding: 128px var(--g-pad) 160px;
+  text-align: center;
+  background: var(--bg-1);
+  border-top: 1px solid var(--g-divider);
 }
-.cta p { font-size: 16px; color: var(--t3); margin-bottom: 36px; }
-.cta-actions { display: flex; justify-content: center; gap: 12px; }
-.cta-actions .btn-a { padding: 12px 28px; font-size: 14px; }
-.cta-actions .btn   { padding: 12px 24px; font-size: 14px; }
+.cta h2 {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.0; max-width: 720px; margin: 0 auto 20px;
+  text-transform: lowercase;
+}
+.cta h2 em {
+  font-style: normal; font-weight: 300; color: var(--t2);
+}
+.cta p {
+  font-size: 16px; color: var(--t3);
+  margin-bottom: 40px; letter-spacing: -0.005em;
+}
+.cta-actions {
+  display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+}
+.cta-actions .pill { padding: 12px 26px; font-size: 13px; }
 
 /* ═══════════════════════════════════════
-   FOOTER
+   FOOTER — dark surface + neon wordmark
    ═══════════════════════════════════════ */
-.footer {
-  max-width: var(--max); margin: 0 auto; padding: 24px;
-  border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+.footer-section {
+  background: #15151a;
+  color: #d4d4d8;
+  padding: 80px 0 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
 }
-.footer-l { font-size: 12px; color: var(--t4); }
-.footer-r { display: flex; gap: 20px; }
-.footer-r a { font-size: 12px; font-weight: 500; color: var(--t4); transition: color 0.15s; }
-.footer-r a:hover { color: var(--t2); }
+.footer-inner {
+  max-width: var(--g-max);
+  margin: 0 auto;
+  padding: 0 var(--g-pad);
+}
+.footer-meta-row {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 20px; margin-bottom: 56px;
+}
+.footer-tag {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-links a {
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.6); transition: color 0.15s;
+  letter-spacing: -0.005em; text-transform: lowercase;
+}
+.footer-links a:hover { color: #fff; }
+
+/* Wordmark */
+.wordmark-wrap {
+  width: 100%; padding: 0;
+  line-height: 0;
+  margin-bottom: 48px;
+}
+.wordmark-svg {
+  width: 100%; height: auto; display: block;
+}
+.wordmark-svg text {
+  font-family: var(--font-plus-jakarta);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  fill: var(--c-wordmark);
+  stroke: var(--c-wordmark-stroke);
+  stroke-width: 0.5;
+  text-transform: lowercase;
+}
+.wordmark-svg tspan {
+  animation: wordmark-flicker 3s steps(1, end) infinite;
+}
+@keyframes wordmark-flicker {
+  0%, 40%, 45%, 58%, 67%, 79%, 83%, 100% { fill: #8b1a1a; stroke: #b52e2e; }
+  42%, 60%, 63%, 81% { fill: #b52828; stroke: #c23838; }
+}
+
+/* Marquee */
+.footer-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  padding: 14px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 32px;
+}
+.footer-marquee__track {
+  display: inline-flex;
+  gap: 48px;
+  animation: marquee-x 40s linear infinite;
+  will-change: transform;
+}
+.footer-marquee__track span {
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 14px;
+}
+.footer-marquee__track span::after {
+  content: '✦';
+  color: var(--c-yellow-300);
+  font-size: 10px;
+}
+@keyframes marquee-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: rgba(255,255,255,0.35);
+  flex-wrap: wrap; gap: 12px;
+  font-family: var(--font-mono); letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════
+   ASSISTIVE TOUCH — floating yellow pill
+   ═══════════════════════════════════════ */
+.floater {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 9999;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--c-yellow-300);
+  border: 1px solid var(--c-yellow-400);
+  color: #78350f;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(253,224,71,0.4),
+              0 4px 10px rgba(0,0,0,0.12),
+              inset 0 -2px 4px rgba(0,0,0,0.08),
+              inset 0 1px 0 rgba(255,255,255,0.5);
+  transition: transform 300ms cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 300ms ease-out,
+              width 300ms cubic-bezier(0.22,1,0.36,1);
+  animation: floater-nudge 4.5s ease-in-out infinite;
+  overflow: hidden; white-space: nowrap;
+  font-family: var(--font-plus-jakarta);
+  font-weight: 700; font-size: 12px;
+}
+.floater:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 12px 28px rgba(253,224,71,0.5),
+              0 6px 14px rgba(0,0,0,0.14),
+              inset 0 -2px 4px rgba(0,0,0,0.08),
+              inset 0 1px 0 rgba(255,255,255,0.5);
+  width: 188px;
+  border-radius: 999px;
+}
+.floater-icon { font-size: 24px; flex-shrink: 0; }
+.floater-label {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 200ms ease-out 100ms, transform 200ms ease-out 100ms;
+  margin-left: 8px; margin-right: 4px;
+  letter-spacing: -0.01em;
+}
+.floater:hover .floater-label {
+  opacity: 1; transform: translateX(0);
+}
+@keyframes floater-nudge {
+  0%, 86%, 100% { transform: translateY(0) rotate(0); }
+  90% { transform: translateY(-3px) rotate(-4deg); }
+  93% { transform: translateY(0) rotate(3deg); }
+  96% { transform: translateY(-2px) rotate(-1deg); }
+}
 
 /* ═══════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════ */
 @media (max-width: 900px) {
   .pillars-grid { grid-template-columns: repeat(2, 1fr); }
-  .stw-body { grid-template-columns: 1fr; }
-  .stw-album { border-right: none; border-bottom: 1px solid var(--border); }
+  .stw-body, .aj-body { grid-template-columns: 1fr; }
+  .stw-album, .aj-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
   .uc-grid { grid-template-columns: 1fr; }
   .eco-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
   .hero-cta { flex-wrap: wrap; }
   .cta-actions { flex-wrap: wrap; justify-content: center; }
-  .aj-body { grid-template-columns: 1fr; }
-  .aj-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-  .ai-list .ai-row { grid-template-columns: 44px 1fr; gap: 0 16px; }
+  .ai-list .ai-row { grid-template-columns: 48px 1fr; gap: 0 16px; }
   .ai-list .ai-row .ai-row-num { display: none; }
+  .footer-meta-row { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 520px) {
   .pillars-grid { grid-template-columns: 1fr; }
+  .nav-left { gap: 14px; }
+  .floater { bottom: 18px; right: 18px; width: 52px; height: 52px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ GRAIN OVERLAY ═══ -->
-<div class="grain" aria-hidden="true"></div>
-
 <!-- ═══ NAV ═══ -->
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <div class="nav-left">
-      <a href="#" class="logo">Scope Creep</a>
+      <a href="#" class="logo">scope creep</a>
       <div class="nav-links">
-        <a href="#how">How it works</a>
-        <a href="#ai">AI Delegation</a>
-        <a href="#cases">Use cases</a>
-        <a href="#ecosystem">Ecosystem</a>
+        <a href="#how">how it works</a>
+        <a href="#ai">ai delegation</a>
+        <a href="#cases">use cases</a>
+        <a href="#ecosystem">ecosystem</a>
       </div>
     </div>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle colour theme">
         <span class="theme-toggle-thumb"></span>
       </button>
-      <button class="btn">Log in</button>
-      <a href="#cta" class="btn-a">Get early access</a>
+      <a href="#" class="pill">log in</a>
+      <a href="#cta" class="pill pill-dark">
+        get early access
+        <span class="material-icons-outlined">arrow_outward</span>
+      </a>
     </div>
   </div>
 </nav>
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
-  <div class="hero-pill"><span class="hero-pill-dot"></span> Work management for creative builders</div>
-  <h1>Stop drifting.<br>Start shipping.</h1>
-  <p class="hero-sub">Deliverable-driven planning, AI delegation, and scope drift detection. Built for creative work — not engineering sprints.</p>
-  <div class="hero-cta">
-    <a href="#cta" class="btn-a">Request early access</a>
-    <a href="#how" class="btn">See how it works</a>
+  <div class="hero-inner">
+    <div class="hero-pill"><span class="hero-pill-dot"></span> work management for creative builders</div>
+    <h1>stop drifting.<br><em>start shipping.</em></h1>
+    <p class="hero-sub">deliverable-driven planning, ai delegation, and scope drift detection. built for creative work — not engineering sprints.</p>
+    <div class="hero-cta">
+      <a href="#cta" class="pill pill-dark">
+        request early access
+        <span class="material-icons-outlined">arrow_outward</span>
+      </a>
+      <a href="#how" class="pill">
+        see how it works
+        <span class="material-icons-outlined">arrow_downward</span>
+      </a>
+    </div>
+    <p class="hero-meta">FOR BUILDERS, DESIGNERS, AND SMALL TEAMS · WORKS STANDALONE OR INSIDE ALBUM OS</p>
   </div>
-  <p class="hero-meta">For builders, designers, and small teams · Works standalone or inside Album OS</p>
 </section>
 
 <!-- ═══ EMOTIONAL REFRAME ═══ -->
 <section class="reframe">
-  <h2>You started with a clear plan. Then requests crept in. Context got lost. Deadlines slipped.<br><strong>Scope creep kills creative projects. We built the fix.</strong></h2>
+  <h2>you started with a clear plan. then requests crept in. context got lost. deadlines slipped. <strong>scope creep kills creative projects. we built the fix.</strong></h2>
 </section>
 
 <!-- ═══ 4 PILLARS ═══ -->
 <section class="pillars">
   <div class="pillars-grid">
-    <div class="pillar glow-card">
+    <div class="pillar card-grain">
       <span class="pillar-num">01</span>
-      <div class="pillar-icon" style="color:var(--c-blue)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></div>
-      <h3>Deliverable-driven.</h3>
-      <p>Tasks come from what you're making — decks, pages, prototypes. Not abstract tickets invented from a backlog.</p>
+      <div class="pillar-icon"><span class="material-icons-outlined">adjust</span></div>
+      <h3>deliverable-driven.</h3>
+      <p>tasks come from what you're making — decks, pages, prototypes. not abstract tickets invented from a backlog.</p>
     </div>
-    <div class="pillar glow-card">
+    <div class="pillar card-grain">
       <span class="pillar-num">02</span>
-      <div class="pillar-icon" style="color:var(--c-red)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-      <h3>Context-packed.</h3>
-      <p>Every delegation ships with everything needed. No back-and-forth. No "can you explain what you need?"</p>
+      <div class="pillar-icon"><span class="material-icons-outlined">inventory_2</span></div>
+      <h3>context-packed.</h3>
+      <p>every delegation ships with everything needed. no back-and-forth. no "can you explain what you need?"</p>
     </div>
-    <div class="pillar glow-card">
+    <div class="pillar card-grain">
       <span class="pillar-num">03</span>
-      <div class="pillar-icon" style="color:var(--c-yellow)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
-      <h3>AI-delegated.</h3>
-      <p>Assign to agents with full context packs. Not a freeform prompt — a structured job with a real brief.</p>
+      <div class="pillar-icon"><span class="material-icons-outlined">smart_toy</span></div>
+      <h3>ai-delegated.</h3>
+      <p>assign to agents with full context packs. not a freeform prompt — a structured job with a real brief.</p>
     </div>
-    <div class="pillar glow-card">
+    <div class="pillar card-grain">
       <span class="pillar-num">04</span>
-      <div class="pillar-icon" style="color:var(--c-red)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
-      <h3>Drift-detected.</h3>
-      <p>AI flags when your project grows beyond its original scope. Named after the exact problem it solves.</p>
+      <div class="pillar-icon"><span class="material-icons-outlined">radar</span></div>
+      <h3>drift-detected.</h3>
+      <p>ai flags when your project grows beyond its original scope. named after the exact problem it solves.</p>
     </div>
   </div>
 </section>
 
-<div class="div"></div>
-
 <!-- ═══ SLIDE-TO-WORK ═══ -->
 <section class="sec" id="how">
-  <div class="sec-tag sec-tag-blue">How it works</div>
-  <div class="sec-h">Your brief generates its own task list.</div>
-  <div class="sec-p">Connect a deck, brief, or project outline. Scope Creep reads each deliverable and spawns task clusters for it — copy, design, dev, review. You edit, not create from scratch.</div>
+  <div class="sec-tag">how it works</div>
+  <div class="sec-h">your brief generates its own task list.</div>
+  <div class="sec-p">connect a deck, brief, or project outline. scope creep reads each deliverable and spawns task clusters for it — copy, design, dev, review. you edit, not create from scratch.</div>
 
   <div class="stw-visual">
     <div class="stw-bar">
@@ -786,99 +1167,97 @@ img { display: block; max-width: 100%; }
       <div class="stw-bar-title">LeafMaker Launch</div>
     </div>
     <div class="stw-body">
-      <!-- Album side -->
       <div class="stw-album">
-        <div class="stw-album-label">Album OS · Slides</div>
+        <div class="stw-album-label">album os · slides</div>
         <div class="stw-album-header">
           <div class="stw-album-progress">
             <div class="stw-prog-track"><div class="stw-prog-fill" style="width:45%"></div></div>
-            <span class="stw-prog-label">45% done</span>
+            <span class="stw-prog-label">45% DONE</span>
           </div>
         </div>
         <div class="stw-slide">
           <div class="stw-slide-num">01</div>
-          <div class="stw-slide-title">Positioning</div>
+          <div class="stw-slide-title">positioning</div>
           <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill done" style="width:100%"></div></div> <span>4/4 done</span></div>
         </div>
         <div class="stw-slide">
           <div class="stw-slide-num">02</div>
-          <div class="stw-slide-title">Audience</div>
+          <div class="stw-slide-title">audience</div>
           <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill done" style="width:100%"></div></div> <span>3/3 done</span></div>
         </div>
         <div class="stw-slide active">
           <div class="stw-slide-num">03</div>
-          <div class="stw-slide-title">Landing Page</div>
+          <div class="stw-slide-title">landing page</div>
           <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill active" style="width:43%"></div></div> <span>3/7 tasks done</span></div>
         </div>
         <div class="stw-slide">
           <div class="stw-slide-num">04</div>
-          <div class="stw-slide-title">Pricing</div>
+          <div class="stw-slide-title">pricing</div>
           <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill blocked"></div></div> <span>0/5 tasks — blocked</span></div>
         </div>
         <div class="stw-slide">
           <div class="stw-slide-num">05</div>
-          <div class="stw-slide-title">Visual System</div>
+          <div class="stw-slide-title">visual system</div>
           <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill active" style="width:33%"></div></div> <span>2/6 tasks done</span></div>
         </div>
         <div class="stw-slide">
           <div class="stw-slide-num">06</div>
-          <div class="stw-slide-title">Launch Sequence</div>
-          <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill empty"></div></div> <span>Not started</span></div>
+          <div class="stw-slide-title">launch sequence</div>
+          <div class="stw-slide-meta"><div class="stw-mini-track"><div class="stw-mini-fill empty"></div></div> <span>not started</span></div>
         </div>
       </div>
-      <!-- Scope side -->
       <div class="stw-scope">
-        <div class="stw-scope-label">Scope Creep · Tasks</div>
-        <div class="stw-scope-header">Landing Page</div>
-        <div class="stw-scope-sub">Slide 03 · 3 of 7 complete · 2 delegated to AI</div>
+        <div class="stw-scope-label">scope creep · tasks</div>
+        <div class="stw-scope-header">landing page</div>
+        <div class="stw-scope-sub">slide 03 · 3 of 7 complete · 2 delegated to ai</div>
 
-        <div class="stw-task cat-copy">
+        <div class="stw-task">
           <div class="stw-check done"></div>
           <div class="stw-task-body">
             <div class="stw-task-title done">Write hero copy</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Copy</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">copy</span></div>
           </div>
         </div>
-        <div class="stw-task cat-design">
+        <div class="stw-task">
           <div class="stw-check done"></div>
           <div class="stw-task-body">
             <div class="stw-task-title done">Create 3 mood directions</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Design</span><span class="stw-tag tag-ai">AI drafted</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">design</span><span class="stw-tag tag-ai">AI drafted</span></div>
           </div>
         </div>
-        <div class="stw-task cat-ai">
+        <div class="stw-task">
           <div class="stw-check done"></div>
           <div class="stw-task-body">
             <div class="stw-task-title done">Compare competitor references</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Research</span><span class="stw-tag tag-ai">AI drafted</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">research</span><span class="stw-tag tag-ai">AI drafted</span></div>
           </div>
         </div>
-        <div class="stw-task cat-design">
+        <div class="stw-task">
           <div class="stw-check"></div>
           <div class="stw-task-body">
             <div class="stw-task-title">Generate illustration prompt</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Design</span><span class="stw-tag tag-pr">In progress</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">design</span><span class="stw-tag tag-pr">in progress</span></div>
           </div>
         </div>
-        <div class="stw-task cat-review cat-blocked">
+        <div class="stw-task">
           <div class="stw-check"></div>
           <div class="stw-task-body">
             <div class="stw-task-title">Review with founder</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-rv">Review</span><span class="stw-tag tag-bl">Blocked</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-rv">review</span><span class="stw-tag tag-bl">blocked</span></div>
           </div>
         </div>
-        <div class="stw-task cat-dev">
+        <div class="stw-task">
           <div class="stw-check"></div>
           <div class="stw-task-body">
             <div class="stw-task-title">Prepare dev handoff</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Dev</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">dev</span></div>
           </div>
         </div>
-        <div class="stw-task cat-dev">
+        <div class="stw-task">
           <div class="stw-check"></div>
           <div class="stw-task-body">
             <div class="stw-task-title">Mobile responsive version</div>
-            <div class="stw-task-tags"><span class="stw-tag tag-ws">Dev</span></div>
+            <div class="stw-task-tags"><span class="stw-tag tag-ws">dev</span></div>
           </div>
         </div>
       </div>
@@ -886,218 +1265,201 @@ img { display: block; max-width: 100%; }
   </div>
 </section>
 
-<div class="div"></div>
-
 <!-- ═══ AI DELEGATION ═══ -->
-<section class="sec ai-section" id="ai">
-  <div class="sec-tag sec-tag-yellow">AI Delegation</div>
-  <div class="sec-h">Not generic prompts.<br>Structured execution.</div>
-  <div class="sec-p">Scope Creep sends your AI agent full project context — sources, constraints, prior decisions, and expected output format. Every delegation is a real job, not a chat message.</div>
+<section class="sec" id="ai">
+  <div class="sec-tag">ai delegation</div>
+  <div class="sec-h">not generic prompts.<br>structured execution.</div>
+  <div class="sec-p">scope creep sends your ai agent full project context — sources, constraints, prior decisions, and expected output format. every delegation is a real job, not a chat message.</div>
   <div class="ai-list">
-    <div class="ai-row glow-card">
+    <div class="ai-row">
       <span class="ai-row-num">01</span>
-      <div class="ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
+      <div class="ai-icon"><span class="material-icons-outlined">inventory_2</span></div>
       <div class="ai-row-body">
-        <h3>Context Packs</h3>
-        <p>Bundle brand rules, references, prior decisions, repo links, and constraints into reusable packs. Attach them to any task or agent job — no back-and-forth required.</p>
+        <h3>context packs</h3>
+        <p>bundle brand rules, references, prior decisions, repo links, and constraints into reusable packs. attach them to any task or agent job — no back-and-forth required.</p>
       </div>
     </div>
-    <div class="ai-row glow-card">
+    <div class="ai-row">
       <span class="ai-row-num">02</span>
-      <div class="ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" fill-opacity="0.15"/></svg></div>
+      <div class="ai-icon"><span class="material-icons-outlined">send</span></div>
       <div class="ai-row-body">
-        <h3>Agent Jobs</h3>
-        <p>Structured AI-executable tasks with role, prompt, source context, expected output, and approval mode. Not a freeform chat — a real assignment with a real brief.</p>
+        <h3>agent jobs</h3>
+        <p>structured ai-executable tasks with role, prompt, source context, expected output, and approval mode. not a freeform chat — a real assignment with a real brief.</p>
       </div>
     </div>
-    <div class="ai-row glow-card">
+    <div class="ai-row">
       <span class="ai-row-num">03</span>
-      <div class="ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></div>
+      <div class="ai-icon"><span class="material-icons-outlined">autorenew</span></div>
       <div class="ai-row-body">
-        <h3>Review Workflow</h3>
-        <p>AI drafts move through draft → pending review → approved → shipped. You stay in control. The agent does the heavy lifting. Nothing ships without your sign-off.</p>
+        <h3>review workflow</h3>
+        <p>ai drafts move through draft → pending review → approved → shipped. you stay in control. the agent does the heavy lifting. nothing ships without your sign-off.</p>
       </div>
     </div>
-    <div class="ai-row glow-card">
+    <div class="ai-row">
       <span class="ai-row-num">04</span>
-      <div class="ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div class="ai-icon"><span class="material-icons-outlined">insights</span></div>
       <div class="ai-row-body">
-        <h3>Scope Intelligence</h3>
-        <p>Detects task explosion, duplicate work, unclear ownership, missing deliverable links, and excessive revisions. Surfaces cut/defer/re-scope recommendations before it spirals.</p>
+        <h3>scope intelligence</h3>
+        <p>detects task explosion, duplicate work, unclear ownership, missing deliverable links, and excessive revisions. surfaces cut/defer/re-scope recommendations before it spirals.</p>
       </div>
     </div>
   </div>
 
-  <!-- Agent Jobs Mockup -->
   <div class="aj-visual">
     <div class="stw-bar">
       <div class="stw-dot r"></div><div class="stw-dot y"></div><div class="stw-dot g"></div>
       <div class="stw-bar-title">Agent Jobs · Queue</div>
     </div>
     <div class="aj-body">
-      <!-- Sidebar: job list -->
       <div class="aj-sidebar">
-        <div class="aj-sidebar-label">Agent Jobs · Queue</div>
+        <div class="aj-sidebar-label">agent jobs · queue</div>
 
         <div class="aj-job">
-          <div class="aj-job-num">Job #001</div>
-          <div class="aj-job-title">Write hero copy</div>
-          <span class="aj-chip aj-chip-blue">Approved</span>
+          <div class="aj-job-num">JOB #001</div>
+          <div class="aj-job-title">write hero copy</div>
+          <span class="aj-chip aj-chip-blue">approved</span>
         </div>
         <div class="aj-job">
-          <div class="aj-job-num">Job #002</div>
-          <div class="aj-job-title">Generate mood directions</div>
-          <span class="aj-chip aj-chip-blue">Approved</span>
+          <div class="aj-job-num">JOB #002</div>
+          <div class="aj-job-title">generate mood directions</div>
+          <span class="aj-chip aj-chip-blue">approved</span>
         </div>
         <div class="aj-job active">
-          <div class="aj-job-num">Job #003</div>
-          <div class="aj-job-title">Landing page brief</div>
-          <span class="aj-chip aj-chip-yellow">Pending Review</span>
+          <div class="aj-job-num">JOB #003</div>
+          <div class="aj-job-title">landing page brief</div>
+          <span class="aj-chip aj-chip-yellow">pending review</span>
         </div>
         <div class="aj-job">
-          <div class="aj-job-num">Job #004</div>
-          <div class="aj-job-title">Competitor audit</div>
-          <span class="aj-chip aj-chip-neutral">Draft</span>
+          <div class="aj-job-num">JOB #004</div>
+          <div class="aj-job-title">competitor audit</div>
+          <span class="aj-chip aj-chip-neutral">draft</span>
         </div>
       </div>
 
-      <!-- Detail panel: job #003 -->
       <div class="aj-detail">
-        <div class="aj-detail-title">Landing page brief</div>
-        <div class="aj-detail-sub">Job #003 · Senior Copywriter · Created 2 hrs ago</div>
+        <div class="aj-detail-title">landing page brief</div>
+        <div class="aj-detail-sub">JOB #003 · SENIOR COPYWRITER · CREATED 2 HRS AGO</div>
 
-        <div class="aj-section-label">Role</div>
-        <div class="aj-role-text">You are a senior brand copywriter. Write a landing page brief that captures Scope Creep's positioning.</div>
+        <div class="aj-section-label">role</div>
+        <div class="aj-role-text">you are a senior brand copywriter. write a landing page brief that captures scope creep's positioning.</div>
 
-        <div class="aj-section-label">Context</div>
+        <div class="aj-section-label">context</div>
         <div class="aj-context-pills">
-          <span class="aj-ctx-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-            Brand guidelines
-          </span>
-          <span class="aj-ctx-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-            Competitor refs
-          </span>
-          <span class="aj-ctx-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-            Positioning doc
-          </span>
+          <span class="aj-ctx-pill"><span class="material-icons-outlined">folder</span>brand guidelines</span>
+          <span class="aj-ctx-pill"><span class="material-icons-outlined">folder</span>competitor refs</span>
+          <span class="aj-ctx-pill"><span class="material-icons-outlined">folder</span>positioning doc</span>
         </div>
 
-        <div class="aj-section-label">Output preview</div>
+        <div class="aj-section-label">output preview</div>
         <div class="aj-output-area">
-          <div class="aj-output-line">## Landing Page Brief — Scope Creep</div>
-          <div class="aj-output-line dim">### Hook</div>
-          <div class="aj-output-line">Every creative project starts with a plan. Then scope</div>
+          <div class="aj-output-line">## landing page brief — scope creep</div>
+          <div class="aj-output-line dim">### hook</div>
+          <div class="aj-output-line">every creative project starts with a plan. then scope</div>
           <div class="aj-output-line">creeps in — requests, revisions, context gaps...<span class="aj-cursor"></span></div>
         </div>
 
         <div class="aj-detail-footer">
           <span class="aj-status-badge">
-            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
-            Pending Review
+            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+            pending review
           </span>
-          <a href="#cta" class="btn-a" style="font-size:12px; padding: 6px 14px;">Approve</a>
-          <button class="btn" style="font-size:12px; padding: 6px 14px;">Request revision</button>
+          <a href="#cta" class="pill pill-dark" style="font-size:11px; padding: 7px 14px;">
+            approve
+            <span class="material-icons-outlined">check</span>
+          </a>
+          <button class="pill" style="font-size:11px; padding: 7px 14px;">request revision</button>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="div"></div>
-
 <!-- ═══ USE CASES ═══ -->
 <section class="sec" id="cases">
-  <div class="sec-tag sec-tag-red">Use cases</div>
-  <div class="sec-h">Built for how creative work actually moves.</div>
-  <div class="sec-p">Not project management theory. Real workflows for people who ship.</div>
+  <div class="sec-tag">use cases</div>
+  <div class="sec-h">built for how creative work actually moves.</div>
+  <div class="sec-p">not project management theory. real workflows for people who ship.</div>
   <div class="uc-grid">
-    <div class="uc-card glow-card" data-num="01">
-      <div class="uc-icon-sym uc-amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
-      <h3>Product launch</h3>
-      <p>Album holds your launch deck. Scope Creep generates tasks for copy, visuals, landing page, pricing, launch email, demo video, and FAQ — all tied to slides.</p>
+    <div class="uc-card card-grain" data-num="01">
+      <div class="uc-icon-sym"><span class="material-icons-outlined">rocket_launch</span></div>
+      <h3>product launch</h3>
+      <p>album holds your launch deck. scope creep generates tasks for copy, visuals, landing page, pricing, launch email, demo video, and faq — all tied to slides.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag c-amber">copy</span>
-        <span class="uc-flow-tag c-amber">visuals</span>
-        <span class="uc-flow-tag c-amber">landing</span>
-        <span class="uc-flow-tag c-amber">pricing</span>
-        <span class="uc-flow-tag c-amber">email</span>
-        <span class="uc-flow-tag c-amber">video</span>
+        <span class="uc-flow-tag">copy</span>
+        <span class="uc-flow-tag">visuals</span>
+        <span class="uc-flow-tag">landing</span>
+        <span class="uc-flow-tag">pricing</span>
+        <span class="uc-flow-tag">email</span>
+        <span class="uc-flow-tag">video</span>
       </div>
     </div>
-    <div class="uc-card glow-card" data-num="02">
-      <div class="uc-icon-sym uc-sap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
-      <h3>Design system</h3>
-      <p>Album structures components and principles. Scope Creep turns them into audit tasks, token definitions, variant creation, docs, and engineering handoff.</p>
+    <div class="uc-card card-grain" data-num="02">
+      <div class="uc-icon-sym"><span class="material-icons-outlined">grid_view</span></div>
+      <h3>design system</h3>
+      <p>album structures components and principles. scope creep turns them into audit tasks, token definitions, variant creation, docs, and engineering handoff.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag c-sap">audit</span>
-        <span class="uc-flow-tag c-sap">tokens</span>
-        <span class="uc-flow-tag c-sap">variants</span>
-        <span class="uc-flow-tag c-sap">docs</span>
-        <span class="uc-flow-tag c-sap">handoff</span>
+        <span class="uc-flow-tag">audit</span>
+        <span class="uc-flow-tag">tokens</span>
+        <span class="uc-flow-tag">variants</span>
+        <span class="uc-flow-tag">docs</span>
+        <span class="uc-flow-tag">handoff</span>
       </div>
     </div>
-    <div class="uc-card glow-card" data-num="03">
-      <div class="uc-icon-sym uc-mint"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" fill-opacity="0.25"/></svg></div>
-      <h3>Content pipeline</h3>
-      <p>Album stores content cards. Scope Creep manages scripting, shot lists, AI visual generation, editing, review, and publishing sequence.</p>
+    <div class="uc-card card-grain" data-num="03">
+      <div class="uc-icon-sym"><span class="material-icons-outlined">play_circle</span></div>
+      <h3>content pipeline</h3>
+      <p>album stores content cards. scope creep manages scripting, shot lists, ai visual generation, editing, review, and publishing sequence.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag c-mint">script</span>
-        <span class="uc-flow-tag c-mint">shots</span>
-        <span class="uc-flow-tag c-mint">AI gen</span>
-        <span class="uc-flow-tag c-mint">edit</span>
-        <span class="uc-flow-tag c-mint">publish</span>
+        <span class="uc-flow-tag">script</span>
+        <span class="uc-flow-tag">shots</span>
+        <span class="uc-flow-tag">ai gen</span>
+        <span class="uc-flow-tag">edit</span>
+        <span class="uc-flow-tag">publish</span>
       </div>
     </div>
-    <div class="uc-card glow-card" data-num="04">
-      <div class="uc-icon-sym uc-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-      <h3>Product spec</h3>
-      <p>Album holds the spec narrative. Scope Creep handles requirements drafting, dependency mapping, developer clarifications, QA checklist, and release prep.</p>
+    <div class="uc-card card-grain" data-num="04">
+      <div class="uc-icon-sym"><span class="material-icons-outlined">description</span></div>
+      <h3>product spec</h3>
+      <p>album holds the spec narrative. scope creep handles requirements drafting, dependency mapping, developer clarifications, qa checklist, and release prep.</p>
       <div class="uc-flow">
-        <span class="uc-flow-tag c-violet">requirements</span>
-        <span class="uc-flow-tag c-violet">deps</span>
-        <span class="uc-flow-tag c-violet">QA</span>
-        <span class="uc-flow-tag c-violet">release</span>
+        <span class="uc-flow-tag">requirements</span>
+        <span class="uc-flow-tag">deps</span>
+        <span class="uc-flow-tag">qa</span>
+        <span class="uc-flow-tag">release</span>
       </div>
     </div>
   </div>
 </section>
-
-<div class="div"></div>
 
 <!-- ═══ ECOSYSTEM ═══ -->
 <section class="sec" id="ecosystem">
-  <div class="sec-tag sec-tag-blue">Ecosystem</div>
-  <div class="sec-h">Three layers. One project world.</div>
-  <div class="sec-p">Album OS organizes. Scope Creep executes. Bad Actors personify. Same project, different lenses.</div>
+  <div class="sec-tag">ecosystem</div>
+  <div class="sec-h">three layers. one project world.</div>
+  <div class="sec-p">album os organizes. scope creep executes. bad actors personify. same project, different lenses.</div>
   <div class="eco-grid">
-    <div class="eco-card c-blue glow-card">
-      <div class="eco-label">Album OS</div>
-      <h3>The artifact layer.</h3>
-      <p>Projects, slides, cards, ideas, assets, context, documents, deliverables. The structured operating environment where work is organized and presented.</p>
+    <div class="eco-card c-blue card-grain">
+      <div class="eco-label">album os</div>
+      <h3>the artifact layer.</h3>
+      <p>projects, slides, cards, ideas, assets, context, documents, deliverables. the structured operating environment where work is organized and presented.</p>
     </div>
-    <div class="eco-card c-orange glow-card">
-      <div class="eco-label">Scope Creep</div>
-      <h3>The execution layer.</h3>
-      <p>Tasks, delegation, work states, AI orchestration, focus, deadlines, progress, scope detection. Where momentum becomes visible and work moves forward.</p>
+    <div class="eco-card card-grain">
+      <div class="eco-label">scope creep</div>
+      <h3>the execution layer.</h3>
+      <p>tasks, delegation, work states, ai orchestration, focus, deadlines, progress, scope detection. where momentum becomes visible and work moves forward.</p>
     </div>
-    <div class="eco-card c-purple glow-card">
-      <div class="eco-label">Bad Actors</div>
-      <h3>The agent layer.</h3>
-      <p>Characters, personas, AI guides. The identity and personality system that shapes how agents work, communicate, and assist across the ecosystem.</p>
+    <div class="eco-card c-purple card-grain">
+      <div class="eco-label">bad actors</div>
+      <h3>the agent layer.</h3>
+      <p>characters, personas, ai guides. the identity and personality system that shapes how agents work, communicate, and assist across the ecosystem.</p>
     </div>
   </div>
 </section>
 
-<div class="div"></div>
-
 <!-- ═══ SCOPE DETECTION IN ACTION ═══ -->
 <section class="sec" id="scope-detection">
-  <div class="sec-tag sec-tag-red">Scope Detection in action</div>
-  <div class="sec-h">See the drift before it becomes damage.</div>
-  <div class="sec-p">Scope Creep monitors your work in real time — surfacing task explosions, ownership gaps, and silent scope additions before they cost you a sprint.</div>
+  <div class="sec-tag">scope detection in action</div>
+  <div class="sec-h">see the drift before it becomes damage.</div>
+  <div class="sec-p">scope creep monitors your work in real time — surfacing task explosions, ownership gaps, and silent scope additions before they cost you a sprint.</div>
 
   <div class="scope-visual">
     <div class="stw-bar">
@@ -1109,82 +1471,135 @@ img { display: block; max-width: 100%; }
         <div class="scope-warn-stripe red"></div>
         <span class="scope-warn-sev high">HIGH</span>
         <div class="scope-warn-content">
-          <div class="scope-warn-title">Task explosion detected</div>
-          <div class="scope-warn-desc">Landing Page has grown from 4 → 11 tasks. Consider splitting into a dedicated sprint.</div>
-          <div class="scope-warn-meta">+7 tasks · Landing Page · detected 2h ago</div>
+          <div class="scope-warn-title">task explosion detected</div>
+          <div class="scope-warn-desc">landing page has grown from 4 → 11 tasks. consider splitting into a dedicated sprint.</div>
+          <div class="scope-warn-meta">+7 tasks · landing page · detected 2h ago</div>
         </div>
-        <button class="scope-warn-action">Cut</button>
+        <button class="scope-warn-action">cut</button>
       </div>
       <div class="scope-warn">
         <div class="scope-warn-stripe yellow"></div>
         <span class="scope-warn-sev medium">MED</span>
         <div class="scope-warn-content">
-          <div class="scope-warn-title">Unclear ownership</div>
-          <div class="scope-warn-desc">"Review with stakeholders" has no assigned owner for 3 days.</div>
-          <div class="scope-warn-meta">3 days unassigned · Review · detected 6h ago</div>
+          <div class="scope-warn-title">unclear ownership</div>
+          <div class="scope-warn-desc">"review with stakeholders" has no assigned owner for 3 days.</div>
+          <div class="scope-warn-meta">3 days unassigned · review · detected 6h ago</div>
         </div>
-        <button class="scope-warn-action">Defer</button>
+        <button class="scope-warn-action">defer</button>
       </div>
       <div class="scope-warn">
         <div class="scope-warn-stripe blue"></div>
         <span class="scope-warn-sev info">INFO</span>
         <div class="scope-warn-content">
-          <div class="scope-warn-title">Scope drift</div>
-          <div class="scope-warn-desc">"Mobile responsive version" was added but not tied to any slide deliverable.</div>
-          <div class="scope-warn-meta">1 unlinked task · Dev · detected 1h ago</div>
+          <div class="scope-warn-title">scope drift</div>
+          <div class="scope-warn-desc">"mobile responsive version" was added but not tied to any slide deliverable.</div>
+          <div class="scope-warn-meta">1 unlinked task · dev · detected 1h ago</div>
         </div>
-        <button class="scope-warn-action">Accept</button>
+        <button class="scope-warn-action">accept</button>
       </div>
     </div>
   </div>
 </section>
 
-<div class="div"></div>
-
 <!-- ═══ FEATURE SPREAD ═══ -->
 <section class="spread">
-  <div class="spread-title">What else can Scope Creep do?<br><strong>More than you'd expect.</strong></div>
+  <div class="spread-title">what else can scope creep do?<strong>more than you'd expect.</strong></div>
   <div class="spread-cloud">
-    <span>Projects</span>
-    <span>Workstreams</span>
-    <span>Task dependencies</span>
-    <span>Context packs</span>
-    <span>Agent jobs</span>
-    <span>Focus sessions</span>
-    <span>Deliverable tracking</span>
-    <span>Scope warnings</span>
-    <span>Review workflows</span>
-    <span>Daily execution view</span>
-    <span>Slide-to-task generation</span>
-    <span>AI task breakdown</span>
-    <span>Priority queues</span>
-    <span>Blocked item surfacing</span>
-    <span>Version notes</span>
-    <span>Rich attachments</span>
-    <span>Decision logs</span>
-    <span>Energy-based suggestions</span>
-    <span>Templates</span>
-    <span>Bidirectional Album sync</span>
-    <span>Team views</span>
-    <span>Personal + project modes</span>
+    <span>projects</span>
+    <span>workstreams</span>
+    <span>task dependencies</span>
+    <span>context packs</span>
+    <span>agent jobs</span>
+    <span>focus sessions</span>
+    <span>deliverable tracking</span>
+    <span>scope warnings</span>
+    <span>review workflows</span>
+    <span>daily execution view</span>
+    <span>slide-to-task generation</span>
+    <span>ai task breakdown</span>
+    <span>priority queues</span>
+    <span>blocked item surfacing</span>
+    <span>version notes</span>
+    <span>rich attachments</span>
+    <span>decision logs</span>
+    <span>energy-based suggestions</span>
+    <span>templates</span>
+    <span>bidirectional album sync</span>
+    <span>team views</span>
+    <span>personal + project modes</span>
   </div>
 </section>
 
 <!-- ═══ CTA ═══ -->
 <section class="cta" id="cta">
-  <h2>From "there's a lot to do" to <span class="gr">"this is the next right move."</span></h2>
-  <p>Scope Creep is in private beta. Built for builders who ship.</p>
+  <h2>from "there's a lot to do" to <em>"this is the next right move."</em></h2>
+  <p>scope creep is in private beta. built for builders who ship.</p>
   <div class="cta-actions">
-    <a href="mailto:hello@scopecreep.app" class="btn-a">Request early access</a>
-    <a href="#how" class="btn">Back to top</a>
+    <a href="mailto:hello@scopecreep.app" class="pill pill-dark">
+      request early access
+      <span class="material-icons-outlined">arrow_outward</span>
+    </a>
+    <a href="#how" class="pill">
+      back to top
+      <span class="material-icons-outlined">arrow_upward</span>
+    </a>
   </div>
 </section>
 
 <!-- ═══ FOOTER ═══ -->
-<footer class="footer">
-  <div class="footer-l">© 2026 Scope Creep · Built by Naren · <a href="mailto:hello@scopecreep.app" style="color:inherit">hello@scopecreep.app</a></div>
-  <div class="footer-r"><a href="#">Twitter</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+<footer class="footer-section">
+  <div class="footer-inner">
+    <div class="footer-meta-row">
+      <div class="footer-tag">// SCOPE CREEP v0.1 — PRIVATE BETA</div>
+      <div class="footer-links">
+        <a href="#">twitter</a>
+        <a href="#">privacy</a>
+        <a href="#">terms</a>
+        <a href="mailto:hello@scopecreep.app">hello@scopecreep.app</a>
+      </div>
+    </div>
+
+    <div class="wordmark-wrap">
+      <svg class="wordmark-svg" id="wordmarkSvg" viewBox="0 0 1000 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <text id="wordmarkText" x="0" y="160" font-size="200">
+          <tspan style="animation-delay: 0.1s; animation-duration: 2.8s;">s</tspan><tspan style="animation-delay: 0.3s; animation-duration: 3.2s;">c</tspan><tspan style="animation-delay: 0.5s; animation-duration: 2.4s;">o</tspan><tspan style="animation-delay: 0.2s; animation-duration: 3.6s;">p</tspan><tspan style="animation-delay: 0.4s; animation-duration: 2.6s;">e</tspan><tspan style="animation-delay: 0.6s; animation-duration: 3.0s;"> </tspan><tspan style="animation-delay: 0.15s; animation-duration: 2.9s;">c</tspan><tspan style="animation-delay: 0.35s; animation-duration: 3.3s;">r</tspan><tspan style="animation-delay: 0.55s; animation-duration: 2.7s;">e</tspan><tspan style="animation-delay: 0.25s; animation-duration: 3.1s;">e</tspan><tspan style="animation-delay: 0.45s; animation-duration: 2.5s;">p</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <div class="footer-marquee">
+      <div class="footer-marquee__track">
+        <span>deliverable driven</span>
+        <span>context packed</span>
+        <span>ai delegated</span>
+        <span>drift detected</span>
+        <span>built for shippers</span>
+        <span>private beta</span>
+        <span>deliverable driven</span>
+        <span>context packed</span>
+        <span>ai delegated</span>
+        <span>drift detected</span>
+        <span>built for shippers</span>
+        <span>private beta</span>
+        <span>deliverable driven</span>
+        <span>context packed</span>
+        <span>ai delegated</span>
+        <span>drift detected</span>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 SCOPE CREEP · BUILT BY NAREN</div>
+      <div>PART OF THE ALBUM OS ECOSYSTEM</div>
+    </div>
+  </div>
 </footer>
+
+<!-- ═══ FLOATING ASSISTIVE-TOUCH (yellow-300) ═══ -->
+<a href="#cta" class="floater" id="floater" aria-label="Request early access">
+  <span class="material-icons-outlined floater-icon">bolt</span>
+  <span class="floater-label">get early access</span>
+</a>
 
 <script>
 /* ════════════════════════════════════════════
@@ -1193,7 +1608,8 @@ img { display: block; max-width: 100%; }
 const html   = document.documentElement;
 const toggle = document.getElementById('themeToggle');
 const stored = localStorage.getItem('theme');
-const prefer = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+// Light-first per CandidRender palette; fallback to prefers-color-scheme
+const prefer = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 html.dataset.theme = stored || prefer;
 toggle.addEventListener('click', () => {
   const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
@@ -1202,148 +1618,190 @@ toggle.addEventListener('click', () => {
 });
 
 /* ════════════════════════════════════════════
-   NAV SCROLL BORDER
+   NAV SCROLL BORDER — rAF-driven (CandidRender §5)
    ════════════════════════════════════════════ */
 const navEl = document.getElementById('nav');
-window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 20));
+let lastScrolled = false;
+const navTick = () => {
+  const scrolled = window.scrollY > 20;
+  if (scrolled !== lastScrolled) {
+    navEl.classList.toggle('scrolled', scrolled);
+    lastScrolled = scrolled;
+  }
+  requestAnimationFrame(navTick);
+};
+requestAnimationFrame(navTick);
 
 /* ════════════════════════════════════════════
-   GSAP + SCROLLTRIGGER SETUP
+   WORDMARK — auto-fit viewBox (CandidRender §6e)
+   ════════════════════════════════════════════ */
+(function fitWordmark () {
+  const svg  = document.getElementById('wordmarkSvg');
+  const text = document.getElementById('wordmarkText');
+  if (!svg || !text) return;
+  const resize = () => {
+    try {
+      const bb = text.getBBox();
+      const pad = 4;
+      svg.setAttribute('viewBox',
+        `${bb.x - pad} ${bb.y - pad} ${bb.width + pad * 2} ${bb.height + pad * 2}`);
+    } catch (e) { /* font not loaded */ }
+  };
+  // Wait for font to load, then fit
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(resize);
+  } else {
+    setTimeout(resize, 500);
+  }
+  window.addEventListener('resize', resize);
+})();
+
+/* ════════════════════════════════════════════
+   GSAP + SCROLLTRIGGER
    ════════════════════════════════════════════ */
 gsap.registerPlugin(ScrollTrigger);
+gsap.ticker.lagSmoothing(0);
 
-/* ── Hero entrance (power4.out) ── */
-gsap.set(['.hero-pill', '.hero h1', '.hero-sub', '.hero-cta', '.hero-meta'], { opacity: 0, y: 22 });
-const heroTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-heroTl
+const EASE_ENTRANCE = 'power3.out';
+
+/* Safety net: if animations stall (reduced motion, throttled rAF, headless preview),
+   reveal everything after a grace period so content is never permanently hidden. */
+const PREFER_REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (PREFER_REDUCED) {
+  document.documentElement.classList.add('reduce-motion');
+}
+
+/* Hero entrance */
+gsap.set(['.hero-pill', '.hero h1', '.hero-sub', '.hero-cta', '.hero-meta'], { opacity: 0, y: 24 });
+gsap.timeline({ defaults: { ease: 'power4.out' } })
   .to('.hero-pill',  { opacity: 1, y: 0, duration: 0.7 }, 0.1)
-  .to('.hero h1',    { opacity: 1, y: 0, duration: 0.8 }, 0.22)
-  .to('.hero-sub',   { opacity: 1, y: 0, duration: 0.7 }, 0.38)
-  .to('.hero-cta',   { opacity: 1, y: 0, duration: 0.6 }, 0.5)
-  .to('.hero-meta',  { opacity: 1, y: 0, duration: 0.5 }, 0.62);
+  .to('.hero h1',    { opacity: 1, y: 0, duration: 0.9 }, 0.22)
+  .to('.hero-sub',   { opacity: 1, y: 0, duration: 0.7 }, 0.42)
+  .to('.hero-cta',   { opacity: 1, y: 0, duration: 0.6 }, 0.55)
+  .to('.hero-meta',  { opacity: 1, y: 0, duration: 0.5 }, 0.68);
 
-/* ── Reframe text reveal ── */
+/* Reframe */
 gsap.from('.reframe h2', {
   scrollTrigger: { trigger: '.reframe', start: 'top 82%' },
-  opacity: 0, y: 32, duration: 0.9, ease: 'power3.out'
+  opacity: 0, y: 32, duration: 0.9, ease: EASE_ENTRANCE
 });
 
-/* ── Pillars: stagger fade-up, no rotation or scrub ── */
+/* Pillars */
 document.querySelectorAll('.pillar').forEach((el, i) => {
   gsap.from(el, {
     scrollTrigger: { trigger: '.pillars-grid', start: 'top 80%', once: true },
-    opacity: 0, y: 40 + i * 8,
+    opacity: 0, y: 40,
     delay: i * 0.09,
-    duration: 0.72, ease: 'power3.out'
+    duration: 0.7, ease: EASE_ENTRANCE
   });
-  el.addEventListener('mouseenter', () => gsap.to(el, { y: -4, duration: 0.25, ease: 'power2.out' }));
-  el.addEventListener('mouseleave', () => gsap.to(el, { y: 0, duration: 0.35, ease: 'power2.inOut' }));
 });
 
-/* ── Section text reveals ── */
+/* Section text reveals */
 document.querySelectorAll('.sec-tag, .sec-h, .sec-p').forEach(el => {
   gsap.from(el, {
     scrollTrigger: { trigger: el, start: 'top 86%' },
-    opacity: 0, y: 26, duration: 0.7, ease: 'power3.out'
+    opacity: 0, y: 26, duration: 0.7, ease: EASE_ENTRANCE
   });
 });
 
-/* ── STW mockup animated timeline ── */
+/* STW mockup */
 const stwVisual = document.querySelector('.stw-visual');
 if (stwVisual) {
-  gsap.set(stwVisual, { opacity: 0 });
+  gsap.set(stwVisual, { opacity: 0, y: 24 });
   gsap.set('.stw-slide', { opacity: 0, x: -12 });
   gsap.set('.stw-task',  { opacity: 0, x: 12 });
   gsap.set('.stw-check.done', { scale: 0 });
-
-  const stwTl = gsap.timeline({
-    scrollTrigger: { trigger: stwVisual, start: 'top 70%' }
-  });
-  /* 1. Fade in frame */
-  stwTl.to(stwVisual, { opacity: 1, duration: 0.5, ease: 'power2.out' });
-  /* 2. Stagger slides from left */
-  stwTl.to('.stw-slide', { opacity: 1, x: 0, stagger: 0.15, duration: 0.4, ease: 'power3.out' }, '-=0.1');
-  /* 3. Stagger tasks from right */
-  stwTl.to('.stw-task',  { opacity: 1, x: 0, stagger: 0.12, duration: 0.4, ease: 'power3.out' }, '-=0.2');
-  /* 4. Pop checkmarks with elastic ease */
-  stwTl.to('.stw-check.done', { scale: 1, stagger: 0.15, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '+=0.2');
+  const tl = gsap.timeline({ scrollTrigger: { trigger: stwVisual, start: 'top 72%' } });
+  tl.to(stwVisual, { opacity: 1, y: 0, duration: 0.55, ease: EASE_ENTRANCE })
+    .to('.stw-slide', { opacity: 1, x: 0, stagger: 0.12, duration: 0.42, ease: EASE_ENTRANCE }, '-=0.15')
+    .to('.stw-task',  { opacity: 1, x: 0, stagger: 0.1,  duration: 0.42, ease: EASE_ENTRANCE }, '-=0.2')
+    .to('.stw-check.done', { scale: 1, stagger: 0.12, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '+=0.15');
 }
 
-/* ── AI rows: stagger fade-up ── */
+/* AI rows */
 document.querySelectorAll('.ai-row').forEach((el, i) => {
   gsap.from(el, {
     scrollTrigger: { trigger: '.ai-list', start: 'top 82%', once: true },
     opacity: 0, y: 28,
     delay: i * 0.1,
-    duration: 0.65, ease: 'power3.out'
+    duration: 0.65, ease: EASE_ENTRANCE
   });
 });
 
-/* ── Agent Jobs mockup timeline ── */
+/* Agent jobs mockup */
 const ajVisual = document.querySelector('.aj-visual');
 if (ajVisual) {
   gsap.set(ajVisual, { opacity: 0, y: 30 });
   gsap.set('.aj-job', { opacity: 0, x: -16 });
   gsap.set('.aj-detail', { opacity: 0, y: 20 });
-
-  const ajTl = gsap.timeline({
-    scrollTrigger: { trigger: ajVisual, start: 'top 72%' }
-  });
-  ajTl.to(ajVisual, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
-  ajTl.to('.aj-job',    { opacity: 1, x: 0, stagger: 0.12, duration: 0.4, ease: 'power3.out' }, '-=0.1');
-  ajTl.to('.aj-detail', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.25');
+  const tl = gsap.timeline({ scrollTrigger: { trigger: ajVisual, start: 'top 72%' } });
+  tl.to(ajVisual, { opacity: 1, y: 0, duration: 0.55, ease: EASE_ENTRANCE })
+    .to('.aj-job',    { opacity: 1, x: 0, stagger: 0.1, duration: 0.4, ease: EASE_ENTRANCE }, '-=0.15')
+    .to('.aj-detail', { opacity: 1, y: 0, duration: 0.5, ease: EASE_ENTRANCE }, '-=0.25');
 }
 
-/* ── Use case cards: stagger fade-up ── */
+/* Use cases / eco */
 document.querySelectorAll('.uc-card').forEach((el, i) => {
   gsap.from(el, {
     scrollTrigger: { trigger: '.uc-grid', start: 'top 82%', once: true },
-    opacity: 0, y: 36,
-    delay: i * 0.1,
-    duration: 0.65, ease: 'power3.out'
+    opacity: 0, y: 36, delay: i * 0.1, duration: 0.65, ease: EASE_ENTRANCE
   });
 });
-
-/* ── Ecosystem cards: stagger fade-up ── */
 document.querySelectorAll('.eco-card').forEach((el, i) => {
   gsap.from(el, {
     scrollTrigger: { trigger: '.eco-grid', start: 'top 82%', once: true },
-    opacity: 0, y: 32,
-    delay: i * 0.12,
-    duration: 0.65, ease: 'power3.out'
+    opacity: 0, y: 32, delay: i * 0.12, duration: 0.65, ease: EASE_ENTRANCE
   });
 });
 
-/* ── Scope detection warnings stagger ── */
+/* Scope detection */
 const scopeVisual = document.querySelector('.scope-visual');
 if (scopeVisual) {
   gsap.set('.scope-warn', { opacity: 0, x: -20 });
   gsap.to('.scope-warn', {
     scrollTrigger: { trigger: scopeVisual, start: 'top 78%' },
-    opacity: 1, x: 0, stagger: 0.15, duration: 0.5, ease: 'power3.out'
+    opacity: 1, x: 0, stagger: 0.15, duration: 0.5, ease: EASE_ENTRANCE
   });
 }
 
-/* ── Spread cloud tags: stagger fade-up ── */
+/* Spread */
 gsap.from('.spread-cloud span', {
   scrollTrigger: { trigger: '.spread-cloud', start: 'top 82%', once: true },
-  opacity: 0, y: 12, stagger: 0.04, duration: 0.5, ease: 'power2.out'
+  opacity: 0, y: 12, stagger: 0.03, duration: 0.45, ease: 'power2.out'
 });
 
-/* ── CTA reveal ── */
+/* CTA */
 gsap.from(['.cta h2', '.cta p', '.cta-actions'], {
   scrollTrigger: { trigger: '.cta', start: 'top 82%' },
-  opacity: 0, y: 28, duration: 0.7, stagger: 0.12, ease: 'power3.out'
+  opacity: 0, y: 28, duration: 0.7, stagger: 0.12, ease: EASE_ENTRANCE
 });
 
-/* ── Apple-style spotlight glow on cards ── */
-document.querySelectorAll('.glow-card, .ai-row').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--cx', `${e.clientX - r.left}px`);
-    card.style.setProperty('--cy', `${e.clientY - r.top}px`);
+/* Safety net: after 5s, force-reveal anything still stuck below opacity 0.9.
+   Prevents permanently-hidden content if rAF is throttled. */
+setTimeout(() => {
+  document.querySelectorAll('.pillar, .reframe h2, .sec-tag, .sec-h, .sec-p, .stw-visual, .stw-slide, .stw-task, .stw-check, .ai-row, .aj-visual, .aj-job, .aj-detail, .uc-card, .eco-card, .scope-warn, .spread-cloud span, .cta h2, .cta p, .cta-actions').forEach(el => {
+    const o = parseFloat(getComputedStyle(el).opacity);
+    if (o < 0.9) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    }
   });
-});
+}, 5000);
+
+/* ════════════════════════════════════════════
+   FLOATER — hide in CTA section
+   ════════════════════════════════════════════ */
+const floater = document.getElementById('floater');
+const cta = document.getElementById('cta');
+if (floater && cta) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      floater.style.opacity = e.isIntersecting ? '0' : '1';
+      floater.style.pointerEvents = e.isIntersecting ? 'none' : 'auto';
+    });
+  }, { threshold: 0.3 });
+  io.observe(cta);
+}
 </script>
 
 </body>
