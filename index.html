@@ -1066,6 +1066,17 @@ img { display: block; max-width: 100%; }
   .ai-list .ai-row .ai-row-num { display: none; }
   .footer-meta-row { flex-direction: column; align-items: flex-start; }
 }
+@media (max-width: 640px) {
+  .nav-right .pill:not(.pill-dark) { display: none; }
+  .nav-right .theme-toggle { display: none; }
+  .nav-right .pill.pill-dark {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  .nav-right .pill.pill-dark .material-icons-outlined { font-size: 13px; }
+  .logo { white-space: nowrap; }
+  .pill { white-space: nowrap; }
+}
 @media (max-width: 520px) {
   .pillars-grid { grid-template-columns: 1fr; }
   .nav-left { gap: 14px; }
